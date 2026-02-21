@@ -91,7 +91,6 @@ ls -t ψ/memory/retrospectives/**/*.md 2>/dev/null | head -1
 ## Related
 
 - `/schedule` - Full calendar view
-- `/wip` - Work in progress
 - `/recap` - Full context summary
 
 ---

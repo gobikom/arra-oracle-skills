@@ -1,9 +1,9 @@
 ---
-name: oracle-soul-sync-calibrate-update
+name: oracle-soul-sync-update
 description: Sync Oracle instruments with the family. Check and update skills to latest version. Use when user says "soul-sync", "sync", "calibrate", "update", or before /awaken.
 ---
 
-# /oracle-soul-sync-calibrate-update
+# /oracle-soul-sync-update
 
 > "Sync your soul with the family."
 
@@ -12,9 +12,9 @@ All-in-one skill: `/soul-sync` + `/calibrate` + `/update` combined.
 ## Usage
 
 ```
-/oracle-soul-sync-calibrate-update           # Check version and update
-/oracle-soul-sync-calibrate-update --check   # Only check, don't update
-/oracle-soul-sync-calibrate-update --cleanup # Uninstall first, then reinstall (removes old skills)
+/oracle-soul-sync-update           # Check version and update
+/oracle-soul-sync-update --check   # Only check, don't update
+/oracle-soul-sync-update --cleanup # Uninstall first, then reinstall (removes old skills)
 ```
 
 ## Step 0: Timestamp
@@ -102,12 +102,16 @@ gh api repos/Soul-Brews-Studio/oracle-skills-cli/commits --jq '.[0:5] | .[] | "\
 
 ---
 
+> **Skill management** has moved to `/oracle` — use `/oracle install`, `/oracle remove`, `/oracle profile`, `/oracle skills`.
+
+---
+
 ## Quick Reference
 
 | Command | Action |
 |---------|--------|
-| `/oracle-soul-sync-calibrate-update` | Check and sync |
-| `/oracle-soul-sync-calibrate-update --cleanup` | Uninstall + reinstall (removes old) |
+| `/oracle-soul-sync-update` | Check and sync |
+| `/oracle-soul-sync-update --cleanup` | Uninstall + reinstall (removes old) |
 | `/awaken` | Full awakening (calls this first) |
 
 ---

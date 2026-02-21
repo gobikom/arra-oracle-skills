@@ -42,8 +42,8 @@ echo "🔍 Fetching latest stable version..."
 LATEST_TAG=$(curl -s https://api.github.com/repos/Soul-Brews-Studio/oracle-skills-cli/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
 
 if [ -z "$LATEST_TAG" ]; then
-  echo "⚠️  Could not fetch latest version, using fallback v1.5.36"
-  LATEST_TAG="v1.5.36"
+  echo "⚠️  Could not fetch latest version, using fallback v1.5.83"
+  LATEST_TAG="v1.5.83"
 fi
 
 echo "📦 Installing oracle-skills@$LATEST_TAG..."

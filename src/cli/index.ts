@@ -19,7 +19,8 @@ More info: https://bun.sh
 import { program } from 'commander';
 import * as p from '@clack/prompts';
 import { agents, detectInstalledAgents, getAgentNames } from './agents.js';
-import { listSkills, installSkills, uninstallSkills } from './installer.js';
+import { listSkills, installSkills, uninstallSkills, discoverSkills } from './installer.js';
+import { profiles, resolveProfile } from '../profiles.js';
 import type { ShellMode } from './fs-utils.js';
 import pkg from '../../package.json' with { type: 'json' };
 
@@ -37,6 +38,7 @@ program
   .option('-g, --global', 'Install to user directory instead of project')
   .option('-a, --agent <agents...>', 'Target specific agents (e.g., claude-code, opencode)')
   .option('-s, --skill <skills...>', 'Install specific skills by name')
+  .option('-p, --profile <name>', 'Install a skill profile (core, minimal, full, post-awaken)')
   .option('-l, --list', 'List available skills without installing')
   .option('-y, --yes', 'Skip confirmation prompts')
   .option('--commands', 'Also install command stubs to ~/.claude/commands/')
@@ -116,10 +118,18 @@ program
         : options.noShell ? 'no-shell'
         : 'auto';
 
+      // Validate profile if specified
+      if (options.profile && !profiles[options.profile]) {
+        p.log.error(`Unknown profile: ${options.profile}`);
+        p.log.info(`Available profiles: ${Object.keys(profiles).join(', ')}`);
+        return;
+      }
+
       // Install skills
       await installSkills(targetAgents, {
         global: options.global,
         skills: options.skill,
+        profile: options.profile,
         yes: options.yes,
         commands: options.commands,
         shellMode,
@@ -283,6 +293,58 @@ program
     }
 
     console.log(`Total: ${totalSkills} skills across ${targetAgents.length} agent(s)\n`);
+  });
+
+// Profiles command
+program
+  .command('profiles')
+  .description('List available skill profiles')
+  .argument('[name]', 'Show skills in a specific profile')
+  .action(async (name?: string) => {
+    if (name) {
+      // Show specific profile
+      const profile = profiles[name];
+      if (!profile) {
+        console.log(`\nUnknown profile: ${name}`);
+        console.log(`Available: ${Object.keys(profiles).join(', ')}\n`);
+        return;
+      }
+
+      const allSkills = await discoverSkills();
+      const allNames = allSkills.map((s) => s.name);
+      const resolved = resolveProfile(name, allNames);
+      const skillList = resolved || allNames;
+
+      console.log(`\nProfile: ${name}`);
+      if (profile.include) {
+        console.log(`Type: include (${profile.include.length} skills)\n`);
+      } else if (profile.exclude) {
+        console.log(`Type: exclude ${profile.exclude.length} skills (${skillList.length} remaining)\n`);
+      } else {
+        console.log(`Type: full (all ${skillList.length} skills)\n`);
+      }
+
+      for (const skill of skillList.sort()) {
+        console.log(`  - ${skill}`);
+      }
+      console.log('');
+    } else {
+      // List all profiles
+      const allSkills = await discoverSkills();
+      const allNames = allSkills.map((s) => s.name);
+
+      console.log('\nAvailable profiles:\n');
+      for (const [profileName, profile] of Object.entries(profiles)) {
+        const resolved = resolveProfile(profileName, allNames);
+        const count = resolved ? resolved.length : allNames.length;
+        let type = 'all';
+        if (profile.include) type = 'include';
+        else if (profile.exclude) type = 'exclude';
+        console.log(`  ${profileName.padEnd(15)} ${String(count).padStart(2)} skills  (${type})`);
+      }
+      console.log(`\nUsage: oracle-skills profiles <name>   — show skills in profile`);
+      console.log(`       oracle-skills install -g --profile <name> -y\n`);
+    }
   });
 
 program.parse();

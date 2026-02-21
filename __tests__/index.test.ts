@@ -4,8 +4,8 @@ import { agents, detectInstalledAgents, getAgentNames } from '../src/cli/agents'
 import { discoverSkills } from '../src/cli/installer';
 
 describe('agents', () => {
-  it('should have 14 agents defined', () => {
-    expect(Object.keys(agents).length).toBe(14);
+  it('should have 18 agents defined', () => {
+    expect(Object.keys(agents).length).toBe(18);
   });
 
   it('should return agent names', () => {

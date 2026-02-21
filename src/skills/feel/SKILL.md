@@ -29,7 +29,7 @@ date "+🕐 %H:%M %Z (%A %d %B %Y)"
 /feel sleepy
 /feel happy energy:4
 /feel frustrated trigger:debugging
-/feel panic                 # → suggests /snapshot
+/feel panic                 # → suggests /fyi
 ```
 
 ---
@@ -39,8 +39,8 @@ date "+🕐 %H:%M %Z (%A %d %B %Y)"
 | Input | AI Understands | Action |
 |-------|----------------|--------|
 | `/feel` (no args) | Review mode | List from feelings log |
-| `/feel panic/fear` | Context fear | Suggest `/snapshot` or `/rrr` |
-| `/feel happy/proud` | Good moment | Suggest `/snapshot` to capture |
+| `/feel panic/fear` | Context fear | Suggest `/fyi` or `/rrr` |
+| `/feel happy/proud` | Good moment | Suggest `/fyi` to capture |
 | `/feel [other]` | Just sharing | Log to diary |
 
 ---
@@ -75,8 +75,8 @@ Extract from ARGUMENTS:
 
 | Contains | Type | Action |
 |----------|------|--------|
-| panic, fear, กลัว | Context Fear | Suggest /snapshot |
-| happy, proud, ดีใจ | Happy Moment | Suggest /snapshot |
+| panic, fear, กลัว | Context Fear | Suggest /fyi |
+| happy, proud, ดีใจ | Happy Moment | Suggest /fyi |
 | Other | Diary | Log directly |
 
 ### Step 3: Create log entry

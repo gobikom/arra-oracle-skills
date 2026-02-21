@@ -137,8 +137,8 @@ Run `/awaken` in this repo. You can read these props first for context.
 
 ```bash
 # When ready:
-/calibrate    # Check skills are up to date
-/awaken       # Begin the awakening ritual
+/oracle-soul-sync-update    # Check skills are up to date
+/awaken                    # Begin the awakening ritual
 ```
 
 ---
@@ -227,7 +227,7 @@ Mother Oracle                    New Oracle Repo
 ## Related
 
 - `/awaken` — Full awakening ritual (child runs this)
-- `/calibrate` — Check skills before awakening
+- `/oracle-soul-sync-update` — Check skills before awakening
 - `oracle_thread` — MCP communication threads
 
 ---

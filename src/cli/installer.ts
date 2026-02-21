@@ -5,6 +5,7 @@ import * as p from '@clack/prompts';
 import { agents } from './agents.js';
 import type { Skill, InstallOptions } from './types.js';
 import { mkdirp, rmrf, cpr, mv, rmf, cp, type ShellMode } from './fs-utils.js';
+import { resolveProfile } from '../profiles.js';
 import pkg from '../../package.json' with { type: 'json' };
 
 // Check if an installed skill was installed by oracle-skills-cli
@@ -95,14 +96,27 @@ export async function installSkills(
     return;
   }
 
-  // Filter skills if specific ones requested
+  // Resolve profile → skill list, then apply --skill overrides
   let skillsToInstall = allSkills;
-  if (options.skills && options.skills.length > 0) {
-    skillsToInstall = allSkills.filter((s) => options.skills!.includes(s.name));
-    if (skillsToInstall.length === 0) {
-      p.log.error(`No matching skills found. Available: ${allSkills.map((s) => s.name).join(', ')}`);
-      return;
+  let profileSkillNames: string[] | null = null;
+
+  if (options.profile) {
+    const allNames = allSkills.map((s) => s.name);
+    profileSkillNames = resolveProfile(options.profile, allNames);
+    if (profileSkillNames) {
+      // If --skill is also given, union them with the profile
+      const extras = options.skills || [];
+      const allowed = new Set([...profileSkillNames, ...extras]);
+      skillsToInstall = allSkills.filter((s) => allowed.has(s.name));
     }
+    // null means "full" profile — install everything
+  } else if (options.skills && options.skills.length > 0) {
+    skillsToInstall = allSkills.filter((s) => options.skills!.includes(s.name));
+  }
+
+  if (skillsToInstall.length === 0) {
+    p.log.error(`No matching skills found. Available: ${allSkills.map((s) => s.name).join(', ')}`);
+    return;
   }
 
   // Confirm installation
@@ -358,6 +372,43 @@ Execute the \`${skill.name}\` skill with args: \`$ARGUMENTS\`
     }
 
     p.log.success(`${agent.displayName}: ${targetDir}`);
+
+    // Profile mode: uninstall skills NOT in the profile set
+    if (profileSkillNames) {
+      const profileSet = new Set(skillsToInstall.map((s) => s.name));
+      const installed = readdirSync(targetDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory() && !d.name.startsWith('.'))
+        .map((d) => d.name);
+
+      const toRemove = installed.filter(
+        (name) => !profileSet.has(name) && name !== '_template'
+      );
+
+      if (toRemove.length > 0) {
+        for (const skill of toRemove) {
+          const skillPath = join(targetDir, skill);
+          // Only remove skills installed by oracle-skills-cli
+          if (await isOurSkill(skillPath)) {
+            await rmrf(skillPath, shellMode);
+
+            // Clean up commands/ flat files
+            if (agent.commandsDir) {
+              const commandsDir = options.global ? agent.globalCommandsDir! : join(process.cwd(), agent.commandsDir);
+              const flatFile = join(commandsDir, `${skill}.md`);
+              if (existsSync(flatFile)) await rmf(flatFile, shellMode);
+            }
+
+            // Clean up plugins
+            const pluginPath = join(homedir(), '.claude', 'plugins', skill);
+            if (existsSync(pluginPath)) {
+              await rmrf(pluginPath, shellMode);
+            }
+
+            p.log.info(`Profile cleanup: removed ${skill}`);
+          }
+        }
+      }
+    }
   }
 
   spinner.stop(`Installed ${skillsToInstall.length} skills to ${targetAgents.length} agent(s)`);

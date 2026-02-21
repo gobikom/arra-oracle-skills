@@ -73,7 +73,7 @@ which bun || curl -fsSL https://bun.sh/install | bash
 which ghq || brew install ghq  # or: go install github.com/x-motemen/ghq@latest
 
 # 3. Install oracle-skills
-~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v1.5.36 install -g -y
+~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#main install -g -y
 
 # Permissions are set up during /awaken in your Oracle repo
 echo "✨ Done! Run: claude . then /awaken"
@@ -97,7 +97,7 @@ which ghq || brew install ghq  # macOS
 
 # 3. Install oracle-skills
 ~/.bun/bin/bunx --bun \
-  oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v1.5.36 \
+  oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#main \
   install -g -y
 
 # 4. Setup permissions in your Oracle repo (run BEFORE claude .)
@@ -122,7 +122,7 @@ EOF
 
 # 5. Create alias (add to ~/.bashrc or ~/.zshrc)
 alias oracle-skills='~/.bun/bin/bunx --bun \
-  oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v1.5.36'
+  oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#main'
 
 # 6. Usage (with alias)
 oracle-skills install -g -y
@@ -130,9 +130,9 @@ oracle-skills list -g
 oracle-skills uninstall -g -y
 
 # Or full command
-~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v1.5.36 install -g -y
-~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v1.5.36 list -g
-~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v1.5.36 uninstall -g -y
+~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#main install -g -y
+~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#main list -g
+~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#main uninstall -g -y
 
 # Flags
 # -g  Global (user) directory
@@ -169,16 +169,17 @@ Oracle skills extend your agent's capabilities with specialized workflows:
 | 16 | **forward** | skill | Create handoff + enter plan mode for next |
 | 17 | **fyi** | skill | Log information for future reference |
 | 18 | **merged** | skill | Post-Merge Cleanup |
-| 19 | **oracle-family-scan** | skill | Manage Oracle family |
-| 20 | **oracle-soul-sync-calibrate-update** | skill | Sync Oracle instruments with the family |
-| 21 | **philosophy** | skill | Display Oracle philosophy principles |
-| 22 | **retrospective** | skill | Create session retrospective with AI diary |
-| 23 | **standup** | skill | Daily standup check |
-| 24 | **where-we-are** | skill | Session awareness - alias for /recap --now |
-| 25 | **who-are-you** | skill | Know ourselves |
-| 26 | **worktree** | skill | Git worktree for parallel work |
+| 19 | **oracle** | skill | Manage Oracle skills and profiles |
+| 20 | **oracle-family-scan** | skill | Manage Oracle family |
+| 21 | **oracle-soul-sync-update** | skill | Sync Oracle instruments with the family |
+| 22 | **philosophy** | skill | Display Oracle philosophy principles |
+| 23 | **retrospective** | skill | Create session retrospective with AI diary |
+| 24 | **standup** | skill | Daily standup check |
+| 25 | **where-we-are** | skill | Session awareness - alias for /recap --now |
+| 26 | **who-are-you** | skill | Know ourselves |
+| 27 | **worktree** | skill | Git worktree for parallel work |
 
-*Generated: 2026-02-20 03:33:07 UTC*
+*Generated: 2026-02-21 01:20:16 UTC*
 
 ## Supported Agents
 
@@ -195,9 +196,13 @@ Oracle skills extend your agent's capabilities with specialized workflows:
 | Gemini CLI | `.gemini/skills/` | `~/.gemini/skills/` |
 | Antigravity | `.agent/skills/` | `~/.gemini/antigravity/skills/` |
 | GitHub Copilot | `.github/skills/` | `~/.copilot/skills/` |
-| Clawdbot | `skills/` | `~/.clawdbot/skills/` |
+| OpenClaw | `skills/` | `~/.openclaw/skills/` |
 | Droid | `.factory/skills/` | `~/.factory/skills/` |
 | Windsurf | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` |
+| Cline | `.cline/skills/` | `~/.cline/skills/` |
+| Aider | `.aider/skills/` | `~/.aider/skills/` |
+| Continue | `.continue/skills/` | `~/.continue/skills/` |
+| Zed | `.zed/skills/` | `~/.zed/skills/` |
 
 ## Philosophy
 

@@ -1,0 +1,21 @@
+---
+description: v1.5.83 | Sync Oracle instruments with the family. Check and update skills to latest version. Use when user says "soul-sync", "sync", "calibrate", "update", or before /awaken.
+---
+
+# /oracle-soul-sync-update
+
+Execute the `oracle-soul-sync-update` skill with the provided arguments.
+
+## Instructions
+
+**If you have a Skill tool available**: Use it directly with `skill: "oracle-soul-sync-update"` instead of reading the file manually.
+
+**Otherwise**:
+1. Read the skill file at this exact path: `~/.claude/skills/oracle-soul-sync-update/SKILL.md`
+2. Follow all instructions in the skill file
+3. Pass these arguments to the skill: `$ARGUMENTS`
+
+**IMPORTANT**: Only use the path above. Do NOT search for or use any other file with "oracle-soul-sync-update" in the name.
+
+---
+*oracle-skills-cli v1.5.83*

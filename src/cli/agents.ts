@@ -90,12 +90,12 @@ export const agents: Record<AgentType, AgentConfig> = {
     globalSkillsDir: join(home, '.copilot/skills'),
     detectInstalled: () => existsSync(join(home, '.copilot')),
   },
-  clawdbot: {
-    name: 'clawdbot',
-    displayName: 'Clawdbot',
+  openclaw: {
+    name: 'openclaw',
+    displayName: 'OpenClaw',
     skillsDir: 'skills',
-    globalSkillsDir: join(home, '.clawdbot/skills'),
-    detectInstalled: () => existsSync(join(home, '.clawdbot')),
+    globalSkillsDir: join(home, '.openclaw/skills'),
+    detectInstalled: () => existsSync(join(home, '.openclaw')),
   },
   droid: {
     name: 'droid',
@@ -110,6 +110,34 @@ export const agents: Record<AgentType, AgentConfig> = {
     skillsDir: '.windsurf/skills',
     globalSkillsDir: join(home, '.codeium/windsurf/skills'),
     detectInstalled: () => existsSync(join(home, '.codeium/windsurf')),
+  },
+  cline: {
+    name: 'cline',
+    displayName: 'Cline',
+    skillsDir: '.cline/skills',
+    globalSkillsDir: join(home, '.cline/skills'),
+    detectInstalled: () => existsSync(join(home, '.cline')),
+  },
+  aider: {
+    name: 'aider',
+    displayName: 'Aider',
+    skillsDir: '.aider/skills',
+    globalSkillsDir: join(home, '.aider/skills'),
+    detectInstalled: () => existsSync(join(home, '.aider')),
+  },
+  continue: {
+    name: 'continue',
+    displayName: 'Continue',
+    skillsDir: '.continue/skills',
+    globalSkillsDir: join(home, '.continue/skills'),
+    detectInstalled: () => existsSync(join(home, '.continue')),
+  },
+  zed: {
+    name: 'zed',
+    displayName: 'Zed',
+    skillsDir: '.zed/skills',
+    globalSkillsDir: join(home, '.zed/skills'),
+    detectInstalled: () => existsSync(join(home, '.zed')),
   },
 };
 

@@ -22,9 +22,13 @@ export type AgentType =
   | 'gemini'
   | 'antigravity'
   | 'copilot'
-  | 'clawdbot'
+  | 'openclaw'
   | 'droid'
-  | 'windsurf';
+  | 'windsurf'
+  | 'cline'
+  | 'aider'
+  | 'continue'
+  | 'zed';
 
 export interface Skill {
   name: string;
@@ -37,6 +41,7 @@ import type { ShellMode } from './fs-utils.js';
 export interface InstallOptions {
   global?: boolean;
   skills?: string[];
+  profile?: string;
   yes?: boolean;
   agents?: string[];
   commands?: boolean; // Also install command stubs (for agents with commandsOptIn)
