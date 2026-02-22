@@ -99,5 +99,26 @@ for fp in files:
         'isSidechain': is_sidechain,
     })
 
-sessions.sort(key=lambda s: s['startGMT7'], reverse=True)
-print(json.dumps(sessions, indent=2))
+sessions.sort(key=lambda s: s['startGMT7'])  # chronological (oldest first)
+
+GAP_THRESHOLD = 30  # minutes
+
+def parse_gmt7(s):
+    try: return datetime.strptime(s, '%Y-%m-%d %H:%M')
+    except: return None
+
+with_gaps = []
+for i, s in enumerate(sessions):
+    if i == 0:
+        with_gaps.append({"type": "gap", "label": "sleeping / offline"})
+    else:
+        prev_end = parse_gmt7(sessions[i-1]['endGMT7'])
+        curr_start = parse_gmt7(s['startGMT7'])
+        if prev_end and curr_start:
+            gap_min = int((curr_start - prev_end).total_seconds() / 60)
+            if gap_min > GAP_THRESHOLD:
+                with_gaps.append({"type": "gap", "gapMin": gap_min, "label": f"{gap_min}m gap"})
+    with_gaps.append(s)
+with_gaps.append({"type": "gap", "label": "no session yet"})
+
+print(json.dumps(with_gaps, indent=2))

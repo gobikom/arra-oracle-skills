@@ -241,20 +241,30 @@ python3 ~/.claude/skills/trace/scripts/dig.py [N]
 
 ### Step 3: Display Timeline
 
-Read the JSON output and display as a table:
+Read the JSON output and display as a table. Sessions are chronological (oldest first). Gap rows (`type: "gap"`) span the session column with `· · ·` prefix:
 
 ```markdown
 ## Session Timeline (from --dig)
 
-| # | Date | Time | ~Min | Branch | Msgs | Focus |
-|---|------|------|------|--------|------|-------|
-| 1 | 2026-02-14 | 14:30 | 102 | main | 8 | Wire /rrr to read pulse data |
-| 2 | 2026-02-14 | 12:00 | 20 | main | 5 | oracle-pulse birth + CLI flag |
-| ... |
+| # | Date | Session | Min | Repo | Msgs | Focus |
+|---|------|---------|-----|------|------|-------|
+|   |      | · · · sleeping / offline | | | | |
+| 1 | 02-21 | 08:40–09:08 | 28m | oracle-skills-cli | 5 | Wire /rrr to read pulse data |
+|   |      | · · · 45m gap | | | | |
+| 2 | 02-21 | 09:55–10:23 | 28m | homelab | 3 | oracle-pulse birth + CLI flag |
+|   |      | · · · no session yet | | | | |
 
 **Dirs scanned**: [list PROJECT_DIRS]
 **Total sessions found**: [count]
 ```
+
+Column rendering rules:
+- **Gap rows**: `|   |      | · · · [label] | | | | |` — number + date empty, label in Session col
+- **Date**: `MM-DD` short format (strip year)
+- **Session**: `HH:MM–HH:MM` using `startGMT7` and `endGMT7` (strip date, keep time only)
+- **Min**: `[durationMin]m`
+- **Repo**: basename of `gitBranch` path, or `gitBranch` value directly if short
+- **Msgs**: `realHumanMessages` count
 
 "Msgs" = real typed human messages (not tool approvals).
 
