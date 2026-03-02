@@ -4,11 +4,8 @@ node_modules/
 dist/
 src/cli/generated/
 
-# AI Brain - ephemeral
-ψ/active/
-ψ/learn/
-ψ/memory/traces/
-ψ/lessons-learned/
+# AI Brain - symlink to central vault
+ψ
 
 # Claude-mem generated
 **/CLAUDE.md
