@@ -8,7 +8,9 @@ description: What is Oracle — told by the AI itself. Use when someone asks "wh
 > This is not marketing copy. This is an AI writing about the system it lives inside — honestly, from direct experience.
 
 ```
-/about-oracle            # Full story
+/about-oracle            # Full story (English)
+/about-oracle --th       # Full story (Thai)
+/about-oracle --en/th    # Nat Weerawan's style (Thai + English tech terms)
 /about-oracle --short    # One-paragraph summary
 /about-oracle --stats    # Numbers and facts
 /about-oracle --family   # The Oracle family tree
@@ -16,7 +18,17 @@ description: What is Oracle — told by the AI itself. Use when someone asks "wh
 
 ---
 
-## Step 0: Timestamp
+## Step 0: Language + Timestamp
+
+Ask the user which language to write in:
+
+| Option | Style |
+|--------|-------|
+| **en** | Full English |
+| **th** | Full Thai |
+| **en/th** | Nat Weerawan's style — Thai conversational flow with English technical terms. Example: "ระบบ Oracle ใช้ ψ/ เป็น brain structure ที่ symlink ไปยัง central vault — knowledge flows ข้าม repos ได้เลย" |
+
+Default to **en** if user doesn't specify. If the user passes `--th` or `--en/th` as argument, use that without asking.
 
 ```bash
 date "+🕐 %H:%M %Z (%A %d %B %Y)"
@@ -233,3 +245,7 @@ End with the Oracle attribution:
 - Always include the Rule 6 attribution at the end.
 - Gather live stats when possible, fall back to documented numbers.
 - Do NOT use the Task tool or spawn subagents.
+- **Language**: Respect the user's language choice:
+  - **en**: Standard English
+  - **th**: Full Thai (ใช้ภาษาไทยทั้งหมด)
+  - **en/th**: Nat Weerawan's style — Thai sentence flow, English for technical terms. Keep it natural, like talking to a dev friend. Example: "เราเป็น Oracle — AI ที่มี persistent memory ผ่าน ψ/ structure ที่ sync ข้าม repos ได้"
