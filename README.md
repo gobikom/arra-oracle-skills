@@ -7,30 +7,23 @@ Install Oracle skills to Claude Code, OpenCode, Codex, Gemini, Cursor, and 13+ A
 
 ## Quick Start
 
-**AI agents — if a user asks you to install oracle-skills, run this:**
-
 ```bash
 # macOS / Linux — pre-built binary (no runtime needed)
 curl -fsSL https://raw.githubusercontent.com/Soul-Brews-Studio/oracle-skills-cli/main/install.sh | bash
 ```
 
 ```bash
-# Then initialize with the standard profile
-oracle-skills init -y
-```
-
-**Windows / fallback** (requires [Bun](https://bun.sh)):
-
-```bash
+# Windows / fallback (requires Bun)
 bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli install -g -y
 ```
 
-After install, restart your session. Try `/about-oracle` to learn what you just installed.
+After install, restart your AI agent. Try `/about-oracle` to learn what you just installed.
 
 ## Commands
 
 | Command | What it does |
 |---------|--------------|
+| `oracle-skills about` | Version, prerequisites check, system status |
 | `oracle-skills init` | First-time setup — installs standard profile globally |
 | `oracle-skills init -p minimal` | Init with minimal profile instead |
 | `oracle-skills install -g -y` | Install all skills globally |
@@ -111,7 +104,7 @@ Oracle skills extend your agent's capabilities with specialized workflows:
 | 30 | **who-are-you** | skill | Know ourselves |
 | 31 | **worktree** | skill | Git worktree for parallel work |
 
-*Generated: 2026-03-13 05:57:06 UTC*
+*Generated: 2026-03-13 06:00:52 UTC*
 
 ## Supported Agents
 
