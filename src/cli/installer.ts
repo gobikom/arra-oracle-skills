@@ -5,7 +5,7 @@ import * as p from '@clack/prompts';
 import { agents } from './agents.js';
 import type { Skill, InstallOptions } from './types.js';
 import { mkdirp, rmrf, cpr, mv, rmf, cp, type ShellMode } from './fs-utils.js';
-import { resolveProfile } from '../profiles.js';
+import { resolveProfile, resolveProfileWithFeatures, features as featuresDef } from '../profiles.js';
 import {
   discoverSkills as _discoverSkills,
   readSkillFile,
@@ -60,13 +60,20 @@ export async function installSkills(
     return;
   }
 
-  // Resolve profile → skill list, then apply --skill overrides
+  // Resolve profile/features → skill list, then apply --skill overrides
   let skillsToInstall = allSkills;
   let profileSkillNames: string[] | null = null;
 
   if (options.profile) {
     const allNames = allSkills.map((s) => s.name);
-    profileSkillNames = resolveProfile(options.profile, allNames);
+    const featureNames = options.features || [];
+
+    if (featureNames.length > 0) {
+      profileSkillNames = resolveProfileWithFeatures(options.profile, featureNames, allNames);
+    } else {
+      profileSkillNames = resolveProfile(options.profile, allNames);
+    }
+
     if (profileSkillNames) {
       // If --skill is also given, union them with the profile
       const extras = options.skills || [];
@@ -74,6 +81,16 @@ export async function installSkills(
       skillsToInstall = allSkills.filter((s) => allowed.has(s.name));
     }
     // null means "full" profile — install everything
+  } else if (options.features && options.features.length > 0) {
+    // Features without profile = additive (install feature skills, no cleanup)
+    const featureSkillNames = new Set<string>();
+    for (const feat of options.features) {
+      const skills = featuresDef[feat];
+      if (skills) for (const s of skills) featureSkillNames.add(s);
+    }
+    const extras = options.skills || [];
+    for (const s of extras) featureSkillNames.add(s);
+    skillsToInstall = allSkills.filter((s) => featureSkillNames.has(s.name));
   } else if (options.skills && options.skills.length > 0) {
     skillsToInstall = allSkills.filter((s) => options.skills!.includes(s.name));
   }

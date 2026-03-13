@@ -2,7 +2,7 @@ import type { Command } from 'commander';
 import * as p from '@clack/prompts';
 import { agents, detectInstalledAgents, getAgentNames } from '../agents.js';
 import { listSkills, installSkills } from '../installer.js';
-import { profiles } from '../../profiles.js';
+import { profiles, features as featuresDef } from '../../profiles.js';
 import type { ShellMode } from '../fs-utils.js';
 
 export function registerInstall(program: Command, version: string) {
@@ -13,6 +13,7 @@ export function registerInstall(program: Command, version: string) {
     .option('-a, --agent <agents...>', 'Target specific agents (e.g., claude-code, opencode)')
     .option('-s, --skill <skills...>', 'Install specific skills by name')
     .option('-p, --profile <name>', 'Install a skill profile (seed, minimal, standard, full)')
+    .option('-f, --feature <features...>', 'Add feature modules (soul, network, workspace, creator)')
     .option('-l, --list', 'List available skills without installing')
     .option('-y, --yes', 'Skip confirmation prompts')
     .option('--commands', 'Also install command stubs to ~/.claude/commands/')
@@ -92,10 +93,20 @@ export function registerInstall(program: Command, version: string) {
           return;
         }
 
+        if (options.feature) {
+          const invalidFeatures = options.feature.filter((f: string) => !featuresDef[f]);
+          if (invalidFeatures.length > 0) {
+            p.log.error(`Unknown features: ${invalidFeatures.join(', ')}`);
+            p.log.info(`Available features: ${Object.keys(featuresDef).join(', ')}`);
+            return;
+          }
+        }
+
         await installSkills(targetAgents, {
           global: options.global,
           skills: options.skill,
           profile: options.profile,
+          features: options.feature,
           yes: options.yes,
           commands: options.commands,
           shellMode,
