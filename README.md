@@ -67,7 +67,7 @@ Oracle skills extend your agent's capabilities with specialized workflows:
 | 13 | **speak** | skill + code | Text-to-speech using edge-tts or macOS say |
 | 14 | **watch** | skill + code | Learn from YouTube videos |
 | - |  |  |  |
-| 15 | **awaken** | skill | Guided Oracle birth |
+| 15 | **awaken** | skill | "Guided Oracle birth and awakening ritual |
 | 16 | **birth** | skill | Prepare birth props for a new Oracle repo |
 | 17 | **dig** | skill | Mine Claude Code sessions |
 | 18 | **feel** | skill | Log emotions with optional structure |
@@ -82,7 +82,7 @@ Oracle skills extend your agent's capabilities with specialized workflows:
 | 27 | **who-are-you** | skill | Know ourselves |
 | 28 | **worktree** | skill | Git worktree for parallel work |
 
-*Generated: 2026-03-15 03:52:47 UTC*
+*Generated: 2026-03-17 03:13:56 UTC*
 
 ## Supported Agents
 

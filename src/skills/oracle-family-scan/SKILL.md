@@ -83,7 +83,7 @@ bun __SKILL_DIR__/scripts/fleet-scan.ts
 ```
 
 Shows:
-- All Oracle births by nazt from oracle-v2 issues
+- All Oracle births by nazt from arra-oracle issues
 - Open issues across Soul-Brews-Studio, laris-co, nazt orgs
 - Recently pushed Oracle repos with activity status
 
@@ -136,7 +136,7 @@ Search by human name or GitHub username.
 
 ## Mode 8: sync
 
-Re-fetch all issues from `Soul-Brews-Studio/oracle-v2` and rebuild `oracles.json`.
+Re-fetch all issues from `Soul-Brews-Studio/arra-oracle` and rebuild `oracles.json`.
 
 ```bash
 bun $MOTHER/registry/sync.ts
@@ -161,7 +161,7 @@ bun $MOTHER/registry/query.ts --unwelcomed
 For each unwelcomed Oracle:
 
 ```bash
-gh issue view {N} --repo Soul-Brews-Studio/oracle-v2 --json title,body,author,createdAt
+gh issue view {N} --repo Soul-Brews-Studio/arra-oracle --json title,body,author,createdAt
 ```
 
 Extract:
@@ -192,10 +192,24 @@ cat drafts > ψ/inbox/handoff/welcome-drafts.md
 
 ### Step 5: Post
 
-After human approval:
+After human approval, check the Oracle's `source` field in registry to determine how to post:
 
+**For discussion-sourced Oracles** (source: "discussion"):
 ```bash
-gh issue comment {N} --repo Soul-Brews-Studio/oracle-v2 --body-file /tmp/welcome-{N}.md
+# Get the discussionId from registry, then comment via GraphQL
+DISC_ID=$(jq -r '.oracles[] | select(.id == {N}) | .discussionId' $MOTHER/registry/oracles.json)
+gh api graphql \
+  -f query='mutation($body:String!) {
+    addDiscussionComment(input: {
+      discussionId: "'"$DISC_ID"'", body: $body
+    }) { comment { id url } }
+  }' \
+  -f body="$(cat /tmp/welcome-{N}.md)"
+```
+
+**For issue-sourced Oracles** (source: "issue" or no source field — legacy):
+```bash
+gh issue comment {N} --repo Soul-Brews-Studio/arra-oracle --body-file /tmp/welcome-{N}.md
 ```
 
 ### Step 6: Re-sync
@@ -267,7 +281,7 @@ Each Oracle has: `id`, `name`, `human`, `github`, `born`, `focus`, `owner` (mine
 
 No API calls for queries — reads local JSON. Instant.
 
-Sync uses `gh api graphql` to fetch from `Soul-Brews-Studio/oracle-v2`.
+Sync uses `gh api graphql` to fetch from `Soul-Brews-Studio/arra-oracle`.
 
 ---
 

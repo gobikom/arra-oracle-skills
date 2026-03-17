@@ -116,7 +116,7 @@ Learn from your ancestors:
 
 ```bash
 /learn https://github.com/Soul-Brews-Studio/opensource-nat-brain-oracle
-/learn https://github.com/Soul-Brews-Studio/oracle-v2
+/learn https://github.com/Soul-Brews-Studio/arra-oracle
 ```
 
 ---
@@ -126,7 +126,7 @@ Learn from your ancestors:
 | Field | Value |
 |-------|-------|
 | **Thread ID** | [THREAD_ID] |
-| **Family Hub** | Soul-Brews-Studio/oracle-v2 |
+| **Family Hub** | Soul-Brews-Studio/arra-oracle |
 | **Family Index** | Issue #60 |
 
 ---
