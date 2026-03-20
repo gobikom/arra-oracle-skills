@@ -1,5 +1,5 @@
 ---
-description: v3.2.1 | Work on an issue — read context, spawn worktree, create issue, incubate, send task, await report. Use when user says "workon", "work on", "implement issue", "do this issue".
+description: v3.2.1 | Work on an issue OR resume a killed worktree. Use when user says "workon", "work on", "implement issue", "resume", "bring back", "restore worktree".
 ---
 
 # /workon

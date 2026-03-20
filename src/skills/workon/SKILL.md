@@ -1,11 +1,11 @@
 ---
 name: workon
-description: Work on an issue — read context, spawn worktree, create issue, incubate, send task, await report. Use when user says "workon", "work on", "implement issue", "do this issue".
+description: Work on an issue OR resume a killed worktree. Use when user says "workon", "work on", "implement issue", "resume", "bring back", "restore worktree".
 ---
 
-# /workon — Issue → Work → Report
+# /workon — Work + Resume
 
-One command to go from issue to working agent.
+Start work from issue OR resume killed worktree.
 
 ## Usage
 
@@ -13,6 +13,8 @@ One command to go from issue to working agent.
 /workon #435                              # Work on issue (this repo)
 /workon #435 --oracle neo                 # Assign to specific Oracle
 /workon Soul-Brews-Studio/arra-oracle#435 # Cross-repo issue
+/workon --resume athena                   # Resume killed worktree + old session
+/workon --resume thor                     # Resume Thor with old context
 ```
 
 ## Flow
@@ -88,6 +90,57 @@ Parent reviews → approves → `maw done [worktree]` to cleanup.
 
 ---
 
+## Mode 2: `--resume` — Restore Killed Worktree
+
+### Step 1: Find Old Session
+
+Search `~/.claude/projects/` (NOT maw ls — worktree gone after done/sleep):
+
+```bash
+for dir in ~/.claude/projects/*[name]*/; do
+  echo "=== $(basename $dir) ==="
+  ls -lS "$dir"*.jsonl 2>/dev/null
+done
+```
+
+Pick **largest .jsonl** = most context = real session.
+
+### Step 2: Wake Worktree
+
+```bash
+maw wake mother [name]
+```
+
+### Step 3: Copy Session to New Path
+
+```bash
+OLD_DIR="~/.claude/projects/...-wt-[OLD]-[name]"
+NEW_DIR="~/.claude/projects/...-wt-[NEW]-[name]"
+mkdir -p "$NEW_DIR"
+cp -r "$OLD_DIR/[session-id]" "$NEW_DIR/"
+cp "$OLD_DIR/[session-id].jsonl" "$NEW_DIR/"
+```
+
+### Step 4: Exit Auto-Started Claude + Resume
+
+```bash
+tmux send-keys -t [session]:[window] C-c
+sleep 2
+tmux send-keys -t [session]:[window] "/exit" Enter
+sleep 5
+tmux send-keys -t [session]:[window] "claude --resume [session-id]" Enter
+```
+
+### Step 5: Verify
+
+```bash
+sleep 5
+maw peek [window]
+# Token count > 0 = old context restored
+```
+
+---
+
 ## Rules
 
 - **Always create gh issue** before working (Pulse visibility)
@@ -95,6 +148,7 @@ Parent reviews → approves → `maw done [worktree]` to cleanup.
 - **Feature branch + PR** — never push to main directly
 - **Human approves** delete/close/done/sleep — Oracle works autonomously otherwise
 - **Report to parent + reviewer** when done
+- **Resume scans ~/.claude/projects/** not maw ls (sessions persist after done)
 
 ---
 
