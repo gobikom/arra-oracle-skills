@@ -11,8 +11,8 @@ bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli install -g -
 # Install specific profile
 bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli init -p standard
 
-# Install specific version (alpha)
-bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v3.3.0-alpha.4 install -g -y
+# Install specific version
+bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v3.2.1 install -g -y
 
 # From local clone
 bun run src/cli/index.ts install -g -y
