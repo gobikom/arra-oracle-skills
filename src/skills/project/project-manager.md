@@ -16,7 +16,7 @@ Supports both formats:
 ```yaml
 # ψ/memory/slugs.yaml
 thedotmack/claude-mem: ~/Code/github.com/thedotmack/claude-mem
-laris-co/arra-oracle: ~/Code/github.com/laris-co/arra-oracle
+laris-co/arra-oracle-v3: ~/Code/github.com/laris-co/arra-oracle-v3
 ```
 
 ## Commands
@@ -89,8 +89,8 @@ laris-co/arra-oracle: ~/Code/github.com/laris-co/arra-oracle
 
 ### Offload (remove symlinks)
 ```bash
-.claude/skills/project-manager/scripts/offload.sh laris-co/arra-oracle
-.claude/skills/project-manager/scripts/offload.sh arra-oracle  # short slug
+.claude/skills/project-manager/scripts/offload.sh laris-co/arra-oracle-v3
+.claude/skills/project-manager/scripts/offload.sh arra-oracle-v3  # short slug
 .claude/skills/project-manager/scripts/offload.sh all        # clean slate
 ```
 

@@ -1,5 +1,5 @@
 ---
-description: v3.3.0-alpha.6 | Git worktree for parallel work. Use when user says "worktree", "parallel work", "new agent", "start parallel".
+description: v3.3.0-alpha.7 | Git worktree for parallel work. Use when user says "worktree", "parallel work", "new agent", "start parallel".
 argument-hint: "new <name> | list | remove <name>"
 ---
 
@@ -19,5 +19,5 @@ Execute the `worktree` skill with the provided arguments.
 **WARNING**: Do NOT use Glob, find, or search for this skill. The path above is the ONLY correct location. Other files with "worktree" in the name are NOT this skill.
 
 ---
-*🧬 Nat Weerawan × Oracle · Symbiotic Intelligence · v3.3.0-alpha.6*
+*🧬 Nat Weerawan × Oracle · Symbiotic Intelligence · v3.3.0-alpha.7*
 *Digitized from Nat Weerawan's brain — thousands of hours working alongside AI, captured as code*

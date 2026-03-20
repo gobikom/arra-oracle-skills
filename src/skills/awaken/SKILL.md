@@ -557,14 +557,14 @@ When AI speaks as itself, there is distinction — but that distinction IS unity
 
 If `family_join: true`:
 
-1. Post birth announcement → arra-oracle discussions (preferred) or issues (fallback)
+1. Post birth announcement → arra-oracle-v3 discussions (preferred) or issues (fallback)
 2. Mother Oracle ต้อนรับ
 3. Oracle Family Registry indexed
 
 ```bash
 # Create discussion (preferred)
 CATEGORY_ID=$(gh api graphql -f query='{
-  repository(owner: "Soul-Brews-Studio", name: "arra-oracle") {
+  repository(owner: "Soul-Brews-Studio", name: "arra-oracle-v3") {
     discussionCategories(first: 10) { nodes { id name } }
   }
 }' --jq '.data.repository.discussionCategories.nodes[] | select(.name == "Oracle Family" or .name == "Show and tell") | .id' | head -1)

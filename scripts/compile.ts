@@ -76,7 +76,36 @@ Execute the \`${skillName}\` skill with the provided arguments.
     }
   }
 
-  console.log(`\n✨ Compiled ${count} skill stubs to ${COMMANDS_DIR}`);
+  // Aliases: alternative names pointing to existing skills
+  const aliases: Record<string, string> = {
+    'retrospective': 'rrr',
+  };
+
+  for (const [alias, target] of Object.entries(aliases)) {
+    const targetPath = join(SKILLS_DIR, target, 'SKILL.md');
+    if (existsSync(targetPath)) {
+      const content = await readFile(targetPath, 'utf-8');
+      const parts = content.split(/^---\s*$/m);
+      const frontmatter = parts.length >= 3 ? parts[1] : '';
+      const descMatch = frontmatter.match(/description:\s*(.+)$/m);
+      const rawDescription = descMatch ? descMatch[1].trim() : `${target} skill`;
+
+      const aliasContent = `---
+description: v${pkg.version} | Alias for /${target}. ${rawDescription}
+---
+
+# /${alias}
+
+This is an alias for \`/${target}\`. Use the Skill tool with \`skill: "${target}"\`.
+
+---
+*oracle-skills-cli v${pkg.version}*
+`;
+      await writeFile(join(COMMANDS_DIR, `${alias}.md`), aliasContent);
+    }
+  }
+
+  console.log(`\n✨ Compiled ${count} skill stubs + ${Object.keys(aliases).length} alias(es) to ${COMMANDS_DIR}`);
 }
 
 compile().catch(console.error);

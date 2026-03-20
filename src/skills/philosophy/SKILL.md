@@ -267,7 +267,7 @@ Use this feed when `/awaken` runs in Fast mode. For Full Soul Sync mode, use the
 
 - `oracle-philosophy/PHILOSOPHY.md`
 - `oracle-philosophy-book/2026/ch01-oracle-philosophy.md`
-- `arra-oracle/.claude/knowledge/oracle-philosophy.md`
+- `arra-oracle-v3/.claude/knowledge/oracle-philosophy.md`
 - GitHub Issue #29: Phukhao Oracle Birth
 
 ---

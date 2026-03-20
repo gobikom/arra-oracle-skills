@@ -83,7 +83,7 @@ bun __SKILL_DIR__/scripts/fleet-scan.ts
 ```
 
 Shows:
-- All Oracle births by nazt from arra-oracle issues
+- All Oracle births by nazt from arra-oracle-v3 issues
 - Open issues across Soul-Brews-Studio, laris-co, nazt orgs
 - Recently pushed Oracle repos with activity status
 

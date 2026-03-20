@@ -77,7 +77,7 @@ ls src/skills/ 2>/dev/null | wc -l
 # Oracle-v2 stats (if accessible)
 ORACLE_V2="$HOME/Code/github.com/Soul-Brews-Studio/arra-oracle-v3"
 if [ -d "$ORACLE_V2" ]; then
-  echo "## arra-oracle"
+  echo "## arra-oracle-v3"
   git -C "$ORACLE_V2" rev-list --count HEAD 2>/dev/null
   git -C "$ORACLE_V2" log --reverse --format="%ai" | head -1
 fi
@@ -85,7 +85,7 @@ fi
 # Org repos
 gh repo list Soul-Brews-Studio --limit 100 --json name -q 'length'
 
-# Family count (from arra-oracle issues)
+# Family count (from arra-oracle-v3 issues)
 gh issue view 60 --repo Soul-Brews-Studio/arra-oracle-v3 --json body -q '.body' 2>/dev/null | grep -c "^|" || echo "76+"
 ```
 
@@ -123,9 +123,9 @@ Write the following sections. Do NOT read them verbatim — internalize the data
 Write 2-3 paragraphs explaining Oracle. Key facts to weave in:
 
 - **Created by**: Nat Weerawan (@nazt), Soul Brews Studio
-- **First commit**: December 24, 2025 (arra-oracle), January 18, 2026 (oracle-skills-cli)
+- **First commit**: December 24, 2025 (arra-oracle-v3), January 18, 2026 (oracle-skills-cli)
 - **What it does**: Gives AI coding agents persistent memory, shared philosophy, and practical tools
-- **How**: Through a brain structure called ψ/ (psi), an MCP server (arra-oracle), and a skills CLI
+- **How**: Through a brain structure called ψ/ (psi), an MCP server (arra-oracle-v3), and a skills CLI
 - **Where it runs**: Claude Code, OpenCode, Codex, Gemini CLI, Cursor, GitHub Copilot, and 10+ more
 - **Open source**: MIT license, GitHub org Soul-Brews-Studio
 
@@ -171,7 +171,7 @@ Explain the three pillars simply:
 
 Every repo gets a ψ/ directory (via symlink to a central vault). Knowledge flows between repos through the vault. When you switch projects, your context follows.
 
-**arra-oracle — The Nervous System**
+**arra-oracle-v3 — The Nervous System**
 - MCP server that Claude Code talks to natively
 - 22 tools: search, learn, trace, thread, schedule, handoff
 - SQLite + FTS5 for keyword search, ChromaDB for semantic search
@@ -213,7 +213,7 @@ Present current stats (gather live if possible, fall back to known data):
 |--------|-------|
 | First commit | December 24, 2025 |
 | oracle-skills-cli commits | 351+ |
-| arra-oracle commits | 297+ |
+| arra-oracle-v3 commits | 297+ |
 | Total tags/releases | 100+ |
 | Skills | 30 |
 | Supported agents | 16+ |
