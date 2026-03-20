@@ -51,17 +51,17 @@ Oracle skills extend your agent's capabilities with specialized workflows:
 
 | # | Skill | Type | Description |
 |---|-------|------|-------------|
-| 1 | **about-oracle** | skill + subagent | What is Oracle — told by the AI itself |
+| 1 | **about-oracle** | skill + subagent | What is Oracle |
 | 2 | **learn** | skill + subagent | Explore a codebase |
 | 3 | **mine** | skill + subagent | Extract a specific topic from ONE session |
 | 4 | **rrr** | skill + subagent | Create session retrospective with AI diary |
-| 5 | **trace** | skill + subagent | Find projects across git history, repos |
+| 5 | **trace** | skill + subagent | Find projects, code |
 | 6 | **xray** | skill + subagent | Full anatomy scan of ONE session JSONL |
 | - |  |  |  |
 | 7 | **deep-research** | skill + code | Deep Research via Gemini |
 | 8 | **gemini** | skill + code | Control Gemini via MQTT WebSocket |
 | 9 | **oracle-family-scan** | skill + code | Oracle Family Registry |
-| 10 | **oraclenet** | skill + code | OracleNet — claim identity, post, comment |
+| 10 | **oraclenet** | skill + code | OracleNet social network |
 | 11 | **physical** | skill + code | Physical location awareness from FindMy |
 | 12 | **project** | skill + code | Clone and track external repos |
 | 13 | **recap** | skill + code | Session orientation and awareness |
@@ -69,7 +69,7 @@ Oracle skills extend your agent's capabilities with specialized workflows:
 | 15 | **speak** | skill + code | Text-to-speech using edge-tts or macOS say |
 | 16 | **watch** | skill + code | Learn from YouTube videos |
 | - |  |  |  |
-| 17 | **awaken** | skill | v3.2.1 G-SKLL | "Guided Oracle birth |
+| 17 | **awaken** | skill | Guided Oracle birth and awakening ritual |
 | 18 | **birth** | skill | Prepare birth props for a new Oracle repo |
 | 19 | **dig** | skill | Mine Claude Code sessions |
 | 20 | **feel** | skill | Log emotions with optional structure |
@@ -77,15 +77,15 @@ Oracle skills extend your agent's capabilities with specialized workflows:
 | 22 | **go** | skill | Switch skill profiles and features |
 | 23 | **oracle** | skill | Manage Oracle skills |
 | 24 | **oracle-soul-sync-update** | skill | Sync Oracle instruments with the family |
-| 25 | **philosophy** | skill | Display Oracle philosophy principles |
+| 25 | **philosophy** | skill | Display Oracle philosophy |
 | 26 | **standup** | skill | Daily standup check |
-| 27 | **talk-to** | skill | Talk to an agent via Oracle threads |
+| 27 | **talk-to** | skill | Talk to another Oracle agent via threads |
 | 28 | **where-we-are** | skill | Session awareness |
 | 29 | **who-are-you** | skill | Know ourselves |
 | 30 | **workon** | skill | Work on an issue OR resume a killed worktree |
 | 31 | **worktree** | skill | Git worktree for parallel work |
 
-*Generated: 2026-03-20 11:29:12 UTC*
+*Generated: 2026-03-20 11:47:00 UTC*
 
 ## Supported Agents
 

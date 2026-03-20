@@ -1,5 +1,5 @@
 ---
-description: v3.2.1 | Daily standup check - pending tasks, appointments, recent progress. Use when user says "standup", "morning check", "what's pending".
+description: v3.2.1 | Daily standup check — pending tasks, appointments, recent progress, schedule. Use when user says "standup", "morning check", "what's pending", or at the start of a work day. Do NOT trigger for mid-session status (use /recap --now), session orientation (use /recap), or retrospectives (use /rrr).
 ---
 
 # /standup

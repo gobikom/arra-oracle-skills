@@ -1,6 +1,6 @@
 ---
 name: who-are-you
-description: Know ourselves - show identity, model info, session stats, and Oracle philosophy. Use when user asks "who are you", "who", "who we are", or wants to check current AI identity.
+description: Know ourselves — show current AI identity, model info, session stats, and Oracle philosophy. Use when user asks "who are you", "who", "who we are", "what model", or wants to check current AI identity and session context. Do NOT trigger for "what is oracle" (use /about-oracle), "philosophy" or "principles" (use /philosophy), or general project questions.
 ---
 
 # /who-are-you - Know Ourselves
