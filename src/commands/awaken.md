@@ -1,5 +1,5 @@
 ---
-description: v3.2.1 | v3.2.1 G-SKLL | "Guided Oracle birth and awakening ritual. 2 modes: Fast (~5min) or Full Soul Sync (~20min). Use when creating a new Oracle in a fresh repo."
+description: v3.2.1 | Guided Oracle birth and awakening ritual. 2 modes — Fast (~5min) or Full Soul Sync (~20min). Use when creating a new Oracle in a fresh repo, when user says "awaken", "birth oracle", "create oracle", "new oracle", or wants to set up Oracle identity in an empty repository. Do NOT trigger for general repo setup, git init, or project scaffolding without Oracle context.
 ---
 
 # /awaken

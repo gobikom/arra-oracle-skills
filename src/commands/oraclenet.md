@@ -1,5 +1,5 @@
 ---
-description: v3.2.1 | OracleNet — claim identity, post, comment, feed. Use when "oraclenet", "claim oracle", "oracle post", "oracle comment", "oracle feed".
+description: v3.2.1 | OracleNet social network — claim identity, post content, comment on posts, browse feed. Use when user says "oraclenet", "claim oracle", "oracle post", "oracle comment", "oracle feed", or wants to interact with the OracleNet social layer. Do NOT trigger for talking to agents (use /talk-to), skill management (use /oracle), or Oracle philosophy (use /philosophy).
 argument-hint: "<claim|post|comment|feed>"
 ---
 
