@@ -1,6 +1,6 @@
 # oracle-skills
 
-35 skills for AI coding agents. 18 agents supported. Install once, use everywhere.
+36 skills for AI coding agents. 18 agents supported. Install once, use everywhere.
 
 ## Install
 
@@ -36,7 +36,7 @@ Features stack on any profile: `+soul`, `+network`, `+workspace`, `+creator`
 |---------|-------|--------|
 | **minimal** | 8 | `forward`, `rrr`, `recap`, `standup`, `go`, `about-oracle`, `oracle-family-scan`, `oracle-soul-sync-update` |
 | **standard** | 13 | `forward`, `rrr`, `recap`, `standup`, `trace`, `dig`, `learn`, `talk-to`, `oracle-family-scan`, `go`, `about-oracle`, `oracle-soul-sync-update`, `awaken` |
-| **full** | 35 | all |
+| **full** | 36 | all |
 
 Switch anytime: `/go minimal`, `/go standard`, `/go full`, `/go + soul`
 
@@ -86,14 +86,15 @@ Switch anytime: `/go minimal`, `/go standard`, `/go full`, `/go + soul`
 | 25 | **oracle-soul-sync-update** | skill | Sync Oracle instruments with the family |
 | 26 | **philosophy** | skill | Display Oracle philosophy |
 | 27 | **release-alpha** | skill | Bump version, compile, test, commit, tag |
-| 28 | **standup** | skill | Daily standup check |
-| 29 | **talk-to** | skill | Talk to another Oracle agent via threads |
-| 30 | **what-we-done** | skill | Quick list of what got done |
-| 31 | **whats-next** | skill | Suggest next action based on open issues |
-| 32 | **where-we-are** | skill | Session awareness |
-| 33 | **who-are-you** | skill | Know ourselves |
-| 34 | **workon** | skill | Work on an issue OR resume a killed worktree |
-| 35 | **worktree** | skill | Git worktree for parallel work |
+| 28 | **resonance** | skill | Capture a resonance moment |
+| 29 | **standup** | skill | Daily standup check |
+| 30 | **talk-to** | skill | Talk to another Oracle agent via threads |
+| 31 | **what-we-done** | skill | Quick list of what got done |
+| 32 | **whats-next** | skill | Suggest next action based on open issues |
+| 33 | **where-we-are** | skill | Session awareness |
+| 34 | **who-are-you** | skill | Know ourselves |
+| 35 | **workon** | skill | Work on an issue OR resume a killed worktree |
+| 36 | **worktree** | skill | Git worktree for parallel work |
 
 <!-- skills:end -->
 
