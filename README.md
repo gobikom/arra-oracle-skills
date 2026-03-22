@@ -1,6 +1,6 @@
 # oracle-skills
 
-40 skills for AI coding agents. 18 agents supported.
+41 skills for AI coding agents. 18 agents supported.
 
 ## Install
 
@@ -31,7 +31,7 @@ oracle-skills uninstall -g -y         # remove all
 |---------|-------|--------|
 | **minimal** | 8 | `forward`, `rrr`, `recap`, `standup`, `go`, `about-oracle`, `oracle-family-scan`, `oracle-soul-sync-update` |
 | **standard** | 13 | `forward`, `rrr`, `recap`, `standup`, `trace`, `dig`, `learn`, `talk-to`, `oracle-family-scan`, `go`, `about-oracle`, `oracle-soul-sync-update`, `awaken` |
-| **full** | 40 | all |
+| **full** | 41 | all |
 
 Switch anytime: `/go minimal`, `/go standard`, `/go full`, `/go + soul`
 
@@ -84,16 +84,17 @@ Switch anytime: `/go minimal`, `/go standard`, `/go full`, `/go + soul`
 | 28 | **philosophy** | skill | Display Oracle philosophy |
 | 29 | **release-alpha** | skill | Bump version, compile, test, commit, tag |
 | 30 | **resonance** | skill | Capture a resonance moment |
-| 31 | **standup** | skill | Daily standup check |
-| 32 | **talk-to** | skill | Talk to another Oracle agent via threads |
-| 33 | **tell** | skill | Send one-way command to another Oracle |
-| 34 | **wake** | skill | Spawn Oracle in new tmux tab with instruction |
-| 35 | **what-we-done** | skill | Quick list of what got done |
-| 36 | **whats-next** | skill | Suggest next action based on open issues |
-| 37 | **where-we-are** | skill | Session awareness |
-| 38 | **who-are-you** | skill | Know ourselves |
-| 39 | **workon** | skill | Work on an issue OR resume a killed worktree |
-| 40 | **worktree** | skill | Git worktree for parallel work |
+| 31 | **shortcut** | skill | Create, list, or remove quick skills |
+| 32 | **standup** | skill | Daily standup check |
+| 33 | **talk-to** | skill | Talk to another Oracle agent via threads |
+| 34 | **tell** | skill | Send one-way command to another Oracle |
+| 35 | **wake** | skill | Spawn Oracle in new tmux tab with instruction |
+| 36 | **what-we-done** | skill | Quick list of what got done |
+| 37 | **whats-next** | skill | Suggest next action based on open issues |
+| 38 | **where-we-are** | skill | Session awareness |
+| 39 | **who-are-you** | skill | Know ourselves |
+| 40 | **workon** | skill | Work on an issue OR resume a killed worktree |
+| 41 | **worktree** | skill | Git worktree for parallel work |
 
 <!-- skills:end -->
 
