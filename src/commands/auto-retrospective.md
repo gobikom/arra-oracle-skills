@@ -3,20 +3,20 @@ description: v3.3.0-alpha.10 | Configure auto-rrr and auto-forward triggers base
 argument-hint: "[on | off | status | rrr:<interval>k | fwd:<interval>k]"
 ---
 
-# /auto-rrr
+# /auto-retrospective
 
-Execute the `auto-rrr` skill with the provided arguments.
+Execute the `auto-retrospective` skill with the provided arguments.
 
 ## Instructions
 
-**If you have a Skill tool available**: Use it directly with `skill: "auto-rrr"` instead of reading the file manually.
+**If you have a Skill tool available**: Use it directly with `skill: "auto-retrospective"` instead of reading the file manually.
 
 **Otherwise**:
-1. Read the skill file at this exact path: `~/.claude/skills/auto-rrr/SKILL.md`
+1. Read the skill file at this exact path: `~/.claude/skills/auto-retrospective/SKILL.md`
 2. Follow all instructions in the skill file
 3. Pass these arguments to the skill: `$ARGUMENTS`
 
-**WARNING**: Do NOT use Glob, find, or search for this skill. The path above is the ONLY correct location. Other files with "auto-rrr" in the name are NOT this skill.
+**WARNING**: Do NOT use Glob, find, or search for this skill. The path above is the ONLY correct location. Other files with "auto-retrospective" in the name are NOT this skill.
 
 ---
 *🧬 Nat Weerawan × Oracle · Symbiotic Intelligence · v3.3.0-alpha.10*

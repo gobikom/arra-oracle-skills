@@ -1,10 +1,10 @@
 ---
-name: auto-rrr
+name: auto-retrospective
 description: Configure auto-rrr and auto-forward triggers based on context window usage. Use when user says "auto rrr", "auto-scale", "configure auto triggers", "change rrr interval", "toggle auto", or wants to adjust when /rrr and /forward auto-trigger. Do NOT trigger for running /rrr manually (use /rrr) or creating handoffs (use /forward).
 argument-hint: "[on | off | status | rrr:<interval>k | fwd:<interval>k]"
 ---
 
-# /auto-rrr — Configure Auto-Trigger Settings
+# /auto-retrospective — Configure Auto-Trigger Settings
 
 Manage the auto-scale hook that triggers /rrr and /forward based on context window usage.
 

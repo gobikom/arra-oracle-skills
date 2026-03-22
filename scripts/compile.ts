@@ -78,7 +78,7 @@ Execute the \`${skillName}\` skill with the provided arguments.
 
   // Aliases: alternative names pointing to existing skills
   const aliases: Record<string, string> = {
-    'retrospective': 'rrr',
+    // retrospective is now a standalone skill, not an alias
   };
 
   for (const [alias, target] of Object.entries(aliases)) {
