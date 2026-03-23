@@ -19,6 +19,11 @@ import pkg from '../../package.json' with { type: 'json' };
 // Re-export discoverSkills from skill-source
 export const discoverSkills = _discoverSkills;
 
+/** Quote YAML description values that start with [ to prevent YAML sequence parsing */
+function yamlQuote(desc: string): string {
+  return desc.startsWith('[') ? `'${desc.replace(/'/g, "''")}'` : desc;
+}
+
 // Check if an installed skill was installed by oracle-skills-cli
 async function isOurSkill(skillPath: string): Promise<boolean> {
   const skillMdPath = join(skillPath, 'SKILL.md');
@@ -219,9 +224,13 @@ export async function installSkills(
             );
             // Prepend version AND scope to description (G=Global, L=Local, SKILL for other agents)
             const scopeChar = scope === 'Global' ? 'G' : 'L';
+            const skillTagPrefix = pkg.skillTag ? pkg.skillTag + ' ' : '';
             content = content.replace(
-              /^(description:\s*)(.+?)(\n)/m,
-              `$1${pkg.skillTag ? pkg.skillTag + ' ' : ''}v${pkg.version} ${scopeChar}-SKLL | $2$3`
+              /^(description:\s*)'?(.+?)'?(\n)/m,
+              (_, p1, p2, p3) => {
+                const desc = `${skillTagPrefix}v${pkg.version} ${scopeChar}-SKLL | ${p2}`;
+                return `${p1}${yamlQuote(desc)}${p3}`;
+              }
             );
             await Bun.write(skillMdPath, content);
           }
@@ -351,7 +360,7 @@ oracle-skills-cli v${pkg.version}
           } else if (agentName === 'codex') {
             // Codex: .md prompts → ~/.codex/prompts/ → /prompts:skill-name
             const stubContent = `---
-description: v${pkg.version} ${scopeChar}-CMD | ${skill.description}
+description: ${yamlQuote(`v${pkg.version} ${scopeChar}-CMD | ${skill.description}`)}
 argument-hint: "[args]"
 ---
 
@@ -369,7 +378,7 @@ Pass these arguments to the skill: $ARGUMENTS
           } else {
             // Claude Code, OpenCode, etc.: .md slash commands
             const stubContent = `---
-description: v${pkg.version} ${scopeChar}-CMD | ${skill.description}
+description: ${yamlQuote(`v${pkg.version} ${scopeChar}-CMD | ${skill.description}`)}
 allowed-tools:
   - Bash
   - Read

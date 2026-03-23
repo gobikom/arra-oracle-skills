@@ -1,5 +1,5 @@
 ---
-description: [core] v3.3.0-alpha.11 | Clone and track external repos. Use when user shares GitHub URL to study or develop, or says "search repos", "find repo", "where is [project]". Actions - learn (clone for study), incubate (clone for development), search/find (search repos), list (show tracked).
+description: '[core] v3.3.0-alpha.11 | Clone and track external repos. Use when user shares GitHub URL to study or develop, or says "search repos", "find repo", "where is [project]". Actions - learn (clone for study), incubate (clone for development), search/find (search repos), list (show tracked).'
 argument-hint: "<github-url> | search <query>"
 ---
 

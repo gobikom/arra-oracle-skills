@@ -1,5 +1,5 @@
 ---
-description: [core] v3.3.0-alpha.11 | Oracle Family Registry — scan, query, welcome. 186+ Oracles indexed. Use when user says "family scan", "oracle registry", "welcome new oracles", or needs to check Oracle population.
+description: '[core] v3.3.0-alpha.11 | Oracle Family Registry — scan, query, welcome. 186+ Oracles indexed. Use when user says "family scan", "oracle registry", "welcome new oracles", or needs to check Oracle population.'
 argument-hint: "[--scan | --query <name> | --welcome]"
 ---
 

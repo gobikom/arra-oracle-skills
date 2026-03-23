@@ -1,5 +1,5 @@
 ---
-description: [core] v3.3.0-alpha.11 | Quick session retrospective — summary, lessons, next steps. Use when user says "retrospective", "retro", "session summary", "wrap up session". Do NOT trigger for full /rrr (install arra-symbiosis-skills), session orientation (use /recap), or handoff (use /forward).
+description: '[core] v3.3.0-alpha.11 | Quick session retrospective — summary, lessons, next steps. Use when user says "retrospective", "retro", "session summary", "wrap up session". Do NOT trigger for full /rrr (install arra-symbiosis-skills), session orientation (use /recap), or handoff (use /forward).'
 argument-hint: "[--detail]"
 ---
 
