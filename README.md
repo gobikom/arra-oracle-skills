@@ -1,6 +1,6 @@
 # oracle-skills
 
-18 skills for AI coding agents. 18 agents supported.
+20 skills for AI coding agents. 18 agents supported.
 
 ## Install
 
@@ -11,9 +11,9 @@ bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli install -g -
 ## Profiles
 
 ```
-oracle-skills init                    # minimal (8 skills, default)
-oracle-skills init -p standard        # standard (13 skills)
-oracle-skills install -g -y           # full (all skills)
+oracle-skills init                    # seed (10 skills, default)
+oracle-skills init -p standard        # standard (14 skills)
+oracle-skills install -g -y           # full (all 21 skills)
 oracle-skills select -g               # interactive picker
 oracle-skills uninstall -g -y         # remove all
 ```
@@ -21,17 +21,16 @@ oracle-skills uninstall -g -y         # remove all
 ## Switch
 
 ```
-/go minimal          /go standard          /go full
-/go + soul           /go + network         /go + workspace         /go + creator
+/go seed             /go standard          /go full
+/go + soul           /go + network         /go + workspace
 ```
 
 <!-- profiles:start -->
 
 | Profile | Count | Skills |
 |---------|-------|--------|
-| **minimal** | 8 | `forward`, `retrospective`, `recap`, `standup`, `go`, `about-oracle`, `oracle-family-scan`, `oracle-soul-sync-update` |
-| **standard** | 12 | `forward`, `retrospective`, `recap`, `standup`, `trace`, `learn`, `talk-to`, `oracle-family-scan`, `go`, `about-oracle`, `oracle-soul-sync-update`, `awaken` |
-| **full** | 18 | all |
+| **standard** | 14 | `forward`, `retrospective`, `recap`, `standup`, `trace`, `learn`, `talk-to`, `oracle-family-scan`, `go`, `about-oracle`, `oracle-soul-sync-update`, `awaken`, `inbox`, `memory` |
+| **full** | 20 | all |
 
 Switch anytime: `/go minimal`, `/go standard`, `/go full`, `/go + soul`
 
@@ -64,15 +63,46 @@ Switch anytime: `/go minimal`, `/go standard`, `/go full`, `/go + soul`
 | 9 | **awaken** | skill | Guided Oracle birth and awakening ritual |
 | 10 | **forward** | skill | Create handoff + enter plan mode for next |
 | 11 | **go** | skill | Switch skill profiles and features |
-| 12 | **oracle-soul-sync-update** | skill | Sync Oracle instruments with the family |
-| 13 | **philosophy** | skill | Display Oracle philosophy |
-| 14 | **retrospective** | skill | Quick session retrospective |
-| 15 | **standup** | skill | Daily standup check |
-| 16 | **talk-to** | skill | Talk to another Oracle agent via threads |
-| 17 | **where-we-are** | skill | Session awareness |
-| 18 | **who-are-you** | skill | Know ourselves |
+| 12 | **inbox** | skill | Read and write to Oracle inbox |
+| 13 | **memory** | skill | Scan and manage Claude Code auto-memory |
+| 14 | **oracle-soul-sync-update** | skill | Sync Oracle instruments with the family |
+| 15 | **philosophy** | skill | Display Oracle philosophy |
+| 16 | **retrospective** | skill | Quick session retrospective |
+| 17 | **standup** | skill | Daily standup check |
+| 18 | **talk-to** | skill | Talk to another Oracle agent via threads |
+| 19 | **where-we-are** | skill | Session awareness |
+| 20 | **who-are-you** | skill | Know ourselves |
 
 <!-- skills:end -->
+
+## CLI Commands
+
+```
+oracle-skills install [options]       # install skills to agents
+oracle-skills init [options]          # first-time setup (seed profile)
+oracle-skills uninstall [options]     # remove installed skills
+oracle-skills select [options]        # interactive skill picker
+oracle-skills list [options]          # show installed skills
+oracle-skills profiles [name]         # list skill profiles
+oracle-skills agents                  # list supported agents
+oracle-skills about                   # version, prereqs, status
+oracle-skills awaken                  # TUI awakening mode selector
+oracle-skills inspect [skill]         # inspect a skill (profiles, agents, hooks)
+oracle-skills xray memory [project]   # x-ray Claude Code auto-memory
+oracle-skills shortcut [action]       # create/list/delete command shortcuts
+```
+
+## Hidden Skills
+
+Skills with `hidden: true` in frontmatter are installed but skip command stub generation — invisible in autocomplete, still callable by agents.
+
+```yaml
+---
+name: auto-retrospective
+hidden: true
+description: ...
+---
+```
 
 ## Agents
 

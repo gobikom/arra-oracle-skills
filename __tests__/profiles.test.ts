@@ -8,24 +8,23 @@ const ALL_SKILLS = [
   'oracle-soul-sync-update',
   'schedule', 'project',
   'where-we-are', 'auto-retrospective',
+  'inbox', 'memory',
 ];
 
 describe("profiles", () => {
-  it("minimal has 8 skills", () => {
-    const result = resolveProfile("minimal", ALL_SKILLS);
-    expect(result).toEqual(['forward', 'retrospective', 'recap', 'standup', 'go', 'about-oracle', 'oracle-family-scan', 'oracle-soul-sync-update']);
-    expect(result?.length).toBe(8);
+  it("has 3 profiles: seed, standard, full", () => {
+    expect(Object.keys(profiles)).toEqual(['seed', 'standard', 'full']);
   });
 
-  it("seed is alias for minimal", () => {
-    const seed = resolveProfile("seed", ALL_SKILLS);
-    const minimal = resolveProfile("minimal", ALL_SKILLS);
-    expect(seed).toEqual(minimal);
+  it("seed has 10 skills", () => {
+    const result = resolveProfile("seed", ALL_SKILLS);
+    expect(result).toEqual(['forward', 'retrospective', 'recap', 'standup', 'go', 'about-oracle', 'oracle-family-scan', 'oracle-soul-sync-update', 'inbox', 'memory']);
+    expect(result?.length).toBe(10);
   });
 
-  it("standard has 12 skills", () => {
+  it("standard has 14 skills", () => {
     const result = resolveProfile("standard", ALL_SKILLS);
-    expect(result?.length).toBe(12);
+    expect(result?.length).toBe(14);
     expect(result).toContain('forward');
     expect(result).toContain('retrospective');
     expect(result).toContain('recap');
@@ -33,6 +32,8 @@ describe("profiles", () => {
     expect(result).toContain('learn');
     expect(result).toContain('talk-to');
     expect(result).toContain('awaken');
+    expect(result).toContain('inbox');
+    expect(result).toContain('memory');
   });
 
   it("full returns null (no filtering)", () => {
@@ -68,10 +69,10 @@ describe("features", () => {
 });
 
 describe("resolveProfileWithFeatures", () => {
-  it("minimal + soul = 11 skills", () => {
-    const result = resolveProfileWithFeatures("minimal", ["soul"], ALL_SKILLS);
-    // 8 minimal + 4 soul - 1 overlap (about-oracle) = 11
-    expect(result.length).toBe(11);
+  it("seed + soul = 13 skills", () => {
+    const result = resolveProfileWithFeatures("seed", ["soul"], ALL_SKILLS);
+    // 10 seed + 4 soul - 1 overlap (about-oracle) = 13
+    expect(result.length).toBe(13);
     expect(result).toContain('forward');
     expect(result).toContain('awaken');
     expect(result).toContain('philosophy');
@@ -79,16 +80,16 @@ describe("resolveProfileWithFeatures", () => {
 
   it("standard + network deduplicates", () => {
     const result = resolveProfileWithFeatures("standard", ["network"], ALL_SKILLS);
-    // standard(12) + network(3) - 3 overlap = 12
-    expect(result.length).toBe(12);
+    // standard(14) + network(3) - 3 overlap = 14
+    expect(result.length).toBe(14);
     const unique = new Set(result);
     expect(unique.size).toBe(result.length);
   });
 
-  it("minimal + workspace = 10 skills", () => {
-    const result = resolveProfileWithFeatures("minimal", ["workspace"], ALL_SKILLS);
-    // 8 + 2 = 10
-    expect(result.length).toBe(10);
+  it("seed + workspace = 12 skills", () => {
+    const result = resolveProfileWithFeatures("seed", ["workspace"], ALL_SKILLS);
+    // 10 + 2 = 12
+    expect(result.length).toBe(12);
     expect(result).toContain('schedule');
     expect(result).toContain('project');
   });
@@ -99,15 +100,15 @@ describe("resolveProfileWithFeatures", () => {
   });
 
   it("multiple features stack", () => {
-    const result = resolveProfileWithFeatures("minimal", ["soul", "workspace"], ALL_SKILLS);
-    // 8 + 4 + 2 - 1 (about-oracle overlap) = 13
-    expect(result.length).toBe(13);
+    const result = resolveProfileWithFeatures("seed", ["soul", "workspace"], ALL_SKILLS);
+    // 10 + 4 + 2 - 1 (about-oracle overlap) = 15
+    expect(result.length).toBe(15);
     expect(result).toContain('awaken');
     expect(result).toContain('schedule');
   });
 
   it("empty features = just profile", () => {
-    const result = resolveProfileWithFeatures("minimal", [], ALL_SKILLS);
-    expect(result.length).toBe(8);
+    const result = resolveProfileWithFeatures("seed", [], ALL_SKILLS);
+    expect(result.length).toBe(10);
   });
 });

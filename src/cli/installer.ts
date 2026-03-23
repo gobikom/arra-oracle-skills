@@ -47,7 +47,8 @@ export async function listSkills(): Promise<void> {
   p.log.info(`Found ${skills.length} skills:\n`);
 
   for (const skill of skills) {
-    console.log(`  ${skill.name}`);
+    const tag = skill.hidden ? ' (hidden)' : '';
+    console.log(`  ${skill.name}${tag}`);
     if (skill.description) {
       console.log(`    ${skill.description}\n`);
     }
@@ -339,6 +340,9 @@ bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli#v${pkg.versi
       const cmdFormat = agent.commandFormat || 'md';
 
       for (const skill of skillsToInstall) {
+        // Hidden skills: install SKILL.md but skip command stub (not in autocomplete)
+        if (skill.hidden) continue;
+
         const skillMdPath = join(targetDir, skill.name, 'SKILL.md');
         if (existsSync(skillMdPath)) {
           if (cmdFormat === 'toml') {
