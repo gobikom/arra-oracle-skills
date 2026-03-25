@@ -8,7 +8,7 @@ const ALL_SKILLS = [
   'oracle-soul-sync-update',
   'schedule', 'project',
   'where-we-are', 'auto-retrospective',
-  'inbox', 'memory', 'create-shortcut', 'rrr', 'contacts',
+  'inbox', 'xray', 'create-shortcut', 'rrr', 'contacts',
 ];
 
 describe("profiles", () => {
@@ -18,7 +18,7 @@ describe("profiles", () => {
 
   it("seed has 11 skills", () => {
     const result = resolveProfile("seed", ALL_SKILLS);
-    expect(result).toEqual(['forward', 'retrospective', 'rrr', 'recap', 'standup', 'go', 'about-oracle', 'oracle-family-scan', 'oracle-soul-sync-update', 'inbox', 'memory']);
+    expect(result).toEqual(['forward', 'retrospective', 'rrr', 'recap', 'standup', 'go', 'about-oracle', 'oracle-family-scan', 'oracle-soul-sync-update', 'inbox', 'xray']);
     expect(result?.length).toBe(11);
   });
 
@@ -33,7 +33,7 @@ describe("profiles", () => {
     expect(result).toContain('talk-to');
     expect(result).toContain('awaken');
     expect(result).toContain('inbox');
-    expect(result).toContain('memory');
+    expect(result).toContain('xray');
   });
 
   it("full returns null (no filtering)", () => {

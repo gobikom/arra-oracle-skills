@@ -253,16 +253,24 @@ export function registerXray(program: Command, version: string) {
     .description('Inspect a skill — profiles, agents, hooks, hidden status')
     .action(async (skillName?: string) => inspectSkill(skillName));
 
-  // oracle-skills xray memory [project] | oracle-skills xray memory --all
+  // oracle-skills xray [target] [project] — memory | skills | sessions
   program
-    .command('xray <target> [project]')
-    .description('X-ray deep scan (e.g., xray memory)')
+    .command('xray [target] [project]')
+    .description('X-ray deep scan — memory (default), skills, sessions')
     .option('-a, --all', 'Show all projects')
-    .action(async (target: string, project?: string, options?: { all?: boolean }) => {
-      if (target === 'memory' || target === 'mem') {
+    .action(async (target?: string, project?: string, options?: { all?: boolean }) => {
+      const t = target || 'memory';
+      if (t === 'memory' || t === 'mem') {
         return xrayMemory(project, options?.all);
       }
-      console.log(`\n  Unknown target: ${target}`);
-      console.log('  Available: oracle-skills xray memory [project] [--all]\n');
+      if (t === 'skills' || t === 'skill') {
+        return inspectSkill();
+      }
+      if (t === 'sessions' || t === 'session') {
+        console.log('\n  Sessions x-ray — coming soon.\n');
+        return;
+      }
+      console.log(`\n  Unknown target: ${t}`);
+      console.log('  Available: oracle-skills xray [memory|skills|sessions] [--all]\n');
     });
 }
