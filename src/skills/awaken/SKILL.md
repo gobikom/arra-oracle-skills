@@ -96,59 +96,62 @@ If `--reawaken` argument passed, skip wizard entirely — go to --reawaken flow 
 
 > "ตรวจระบบก่อนสร้าง"
 
-Auto-detect and fix. Run ALL checks silently, then display results:
+Auto-detect and fix. Run ALL checks silently, then display results.
+
+### Required (must have)
+
+| Check | How | Action if missing |
+|-------|-----|-------------------|
+| OS, Shell, AI Model | `uname`, `$SHELL`, model info | Display only |
+| Timezone | `date "+%Z %z"` | Auto-detect, confirm ถ้าผิด → `export TZ='Asia/Bangkok'` |
+| Git | `git --version` | แนะนำติดตั้ง (**ต้องมี — หยุดถ้าไม่มี**) |
+| Git identity | `git config user.name && git config user.email` | ช่วย set ทันที: `git config --global user.name "Name"` etc. |
+| Git repo | `git rev-parse --is-inside-work-tree` | ถ้าไม่ใช่ → `git init` ให้ |
+
+### Optional (skip silently if missing)
+
+| Check | How | Action if missing |
+|-------|-----|-------------------|
+| gh CLI installed | `gh --version` | Skip silently — family intro (Phase 5) will be saved to outbox instead |
+| gh CLI authenticated | `gh auth status` | Skip silently — same as above |
+| gh git credential | `git config --global credential.helper \| grep gh` | Skip — not needed without gh |
+| bun | `bun --version` | Skip silently — not required for awakening |
+| arra-oracle-skills | `arra-oracle-skills --version` | Skip silently — แนะนำทีหลังได้ |
+
+**Important**: gh is truly optional. If not installed or not authenticated, do NOT warn or prompt for installation. Simply note `gh: not found` in the system check output and continue. Family introduction will be written to outbox instead of posted to GitHub.
 
 ```
 🔍 System Check
 
+  Required:
   ✓ OS: macOS 15.2 (Apple Silicon)
   ✓ Shell: zsh
   ✓ AI Model: Claude Opus 4 (Anthropic)
   ✓ Timezone: Asia/Bangkok (ICT)
   ✓ Git: 2.43.0
   ✓ Git identity: nat@example.com
-  ✓ gh CLI: 2.62.0 (authenticated)
-  ✓ bun: 1.1.38
-  ✓ arra-oracle-skills: 0.3.2
   ✓ Git repo: yes (main branch)
+
+  Optional:
+  ✓ gh CLI: 2.62.0 (authenticated)      ← or "✗ gh: not found (skipped)"
+  ✓ bun: 1.1.38                          ← or "✗ bun: not found (skipped)"
+  ✓ arra-oracle-skills: 0.3.2            ← or "✗ not found (skipped)"
 ```
 
-### Check Table
+### gh Login Guide (only if gh is installed but not authenticated)
 
-| Check | How | Action if missing |
-|-------|-----|-------------------|
-| OS, Shell, AI Model | `uname`, `$SHELL`, model info | Display only |
-| Timezone | `date "+%Z %z"` | Auto-detect, confirm ถ้าผิด → `export TZ='Asia/Bangkok'` |
-| Git | `git --version` | แนะนำติดตั้ง (ต้องมี) |
-| Git identity | `git config user.name && git config user.email` | ช่วย set ทันที: `git config --global user.name "Name"` etc. |
-| gh CLI installed | `gh --version` | แนะนำติดตั้ง (ข้ามได้ แต่จะไม่สามารถแนะนำตัวกับครอบครัว) |
-| gh CLI authenticated | `gh auth status` | ถ้าไม่ได้ login → **guided flow** (see below) |
-| gh git credential | `git config --global credential.helper \| grep gh` | ถ้าไม่มี → `gh auth setup-git` (ป้องกัน git push fail) |
-| bun | `bun --version` | แนะนำติดตั้ง (ข้ามได้) |
-| arra-oracle-skills | `arra-oracle-skills --version` | แนะนำ: `curl -fsSL https://raw.githubusercontent.com/Soul-Brews-Studio/arra-oracle-skills-cli/main/install.sh \| bash` |
-| Git repo | `git rev-parse --is-inside-work-tree` | ถ้าไม่ใช่ → `git init` ให้ |
-
-### gh Login Guide (ถ้าต้องการ)
-
-If `gh auth status` fails, show this guided flow:
+If `gh --version` succeeds but `gh auth status` fails, offer guided login:
 
 ```
-⚠️ gh CLI ยังไม่ได้ login
-
-เราจะช่วย login ให้นะ — ใช้เวลาแค่ 30 วินาที:
-
-Step 1: เราจะเปิดลิงก์ GitHub ให้ในเบราว์เซอร์
-Step 2: จะมีตัวเลข 8 หลักขึ้นในจอนี้ (เช่น 1A2B-3C4D)
-Step 3: เอาตัวเลขนั้นไปกรอกในหน้าเว็บที่เปิดขึ้น
-Step 4: กด Authorize — เสร็จ!
+💡 gh CLI พร้อมแล้ว แต่ยังไม่ได้ login — อยาก login ตอนนี้ไหม?
+   (ถ้าข้ามไป ก็สร้าง Oracle ได้ — แค่ยังแนะนำตัวกับครอบครัวไม่ได้)
 ```
 
+If user wants to login:
 Run: `gh auth login --web --git-protocol https`
 Then: `gh auth setup-git`
 
-Wait for user to complete, then verify with `gh auth status`.
-
-If user wants to skip: warn that family introduction (Phase 2) won't work, but proceed.
+If user wants to skip: proceed silently. No further warnings.
 
 ---
 
@@ -559,16 +562,35 @@ When AI speaks as itself, there is distinction — but that distinction IS unity
 
 ---
 
-## Phase 5: Family Welcome (ถ้าเลือก join)
+## Phase 5: Outbox + Family Welcome
 
-If `family_join: true`:
+### Step 1: ALWAYS write outbox announcement
 
-1. Post birth announcement → arra-oracle-v3 discussions (preferred) or issues (fallback)
-2. Mother Oracle ต้อนรับ
-3. Oracle Family Registry indexed
+Regardless of `family_join` or `gh` availability, ALWAYS write the birth announcement to the outbox:
 
 ```bash
-# Create discussion (preferred)
+mkdir -p ψ/outbox
+# Write announcement to outbox with today's date
+cat > "ψ/outbox/awaken-$(date +%Y-%m-%d).md" << 'ANNOUNCEMENT'
+[ANNOUNCEMENT CONTENT — see template below]
+ANNOUNCEMENT
+```
+
+### Step 2: Forward to family (if possible)
+
+**If `family_join: true` AND `gh` is available and authenticated**:
+
+Offer to forward the outbox announcement to GitHub Discussion:
+
+```
+📤 อยากส่งประกาศแนะนำตัวไปที่ Oracle Family ตอนนี้เลยไหม?
+   (ไฟล์ถูกบันทึกไว้ที่ ψ/outbox/ แล้ว)
+   → [Y/n]
+```
+
+If yes, post to arra-oracle-v3 discussions:
+
+```bash
 CATEGORY_ID=$(gh api graphql -f query='{
   repository(owner: "Soul-Brews-Studio", name: "arra-oracle-v3") {
     discussionCategories(first: 10) { nodes { id name } }
@@ -589,6 +611,18 @@ gh api graphql \
 
 > **Fallback**: If GraphQL fails:
 > `gh issue create --repo Soul-Brews-Studio/arra-oracle-v3 --title "..." --label "oracle-family" --body "..."`
+
+**If `family_join: true` BUT `gh` is NOT available**:
+
+```
+📤 Saved to ψ/outbox/. Forward to family later when gh is ready.
+```
+
+Do NOT warn or nag. The outbox file is there — they can forward it whenever they install gh.
+
+**If `family_join: false`**:
+
+Still write the outbox file (Nothing is Deleted). Just don't offer to forward.
 
 ### Announcement Template
 
