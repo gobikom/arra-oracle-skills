@@ -24,3 +24,22 @@ phukhao-oracle/
 .opencode/commands/
 .claude/skills/
 .claude/settings.local.json
+
+# PRP Framework - generated adapters (recreate with: cd .prp && ./scripts/install.sh)
+.claude/
+.claude-plugin/
+.codex/
+.opencode/
+.gemini/
+.agents/
+AGENTS.md
+
+# PRP Framework - artifacts (directory visible to AI tools, content not tracked)
+# .prp-output/** is intentionally not ignored to allow AI tools to read/write artifacts, but we ignore all files within it to prevent tracking
+!.prp-output/
+!.prp-output/**/
+
+# PRP Framework - local clone (not a submodule)
+.prp/
+
+!AGENTS.md
