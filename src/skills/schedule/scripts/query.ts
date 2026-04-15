@@ -7,6 +7,14 @@ export {};
 const filter = process.argv[2] || "upcoming";
 const API = process.env.ORACLE_API || "http://localhost:47778";
 
+// Bearer token for arra-oracle-v3 /api/* (issue #12 Stage 2). When set, we
+// send Authorization: Bearer <token>; when unset, no header (Oracle's
+// optional-enforce middleware allows compat-mode requests through).
+const ORACLE_API_TOKEN = (process.env.ORACLE_API_TOKEN || "").trim();
+const authHeaders: Record<string, string> = ORACLE_API_TOKEN
+  ? { Authorization: `Bearer ${ORACLE_API_TOKEN}` }
+  : {};
+
 const MONTHS: Record<string, string> = {
   jan: "01", january: "01", feb: "02", february: "02",
   mar: "03", march: "03", apr: "04", april: "04",
@@ -76,7 +84,7 @@ switch (filter.toLowerCase()) {
 }
 
 try {
-  const res = await fetch(`${API}/api/schedule?${params}`);
+  const res = await fetch(`${API}/api/schedule?${params}`, { headers: authHeaders });
   if (!res.ok) {
     console.error(`API error: ${res.status} ${res.statusText}`);
     console.error("Is the Oracle server running? Start with: bun src/server.ts");
