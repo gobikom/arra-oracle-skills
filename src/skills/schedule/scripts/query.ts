@@ -7,10 +7,26 @@ export {};
 const filter = process.argv[2] || "upcoming";
 const API = process.env.ORACLE_API || "http://localhost:47778";
 
-// Bearer token for arra-oracle-v3 /api/* (issue #12 Stage 2). When set, we
-// send Authorization: Bearer <token>; when unset, no header (Oracle's
-// optional-enforce middleware allows compat-mode requests through).
-const ORACLE_API_TOKEN = (process.env.ORACLE_API_TOKEN || "").trim();
+// Bearer token for arra-oracle-v3 /api/* (issue #12 Stage 2). Read from env
+// first; if unset, fall back to the shared ~/.secrets/oracle-api.env file
+// so manual invocations (e.g. via Claude Skill tool, where no shell would
+// otherwise source the env) still authenticate. When neither source has
+// the token, no header is sent and Oracle's compat-mode middleware allows
+// the request through.
+async function loadOracleApiToken(): Promise<string> {
+  const fromEnv = (process.env.ORACLE_API_TOKEN || "").trim();
+  if (fromEnv) return fromEnv;
+  try {
+    const home = process.env.HOME || "/home/openclaw";
+    const envFile = await Bun.file(`${home}/.secrets/oracle-api.env`).text();
+    const match = envFile.match(/^ORACLE_API_TOKEN=(.+)$/m);
+    if (match) return match[1].trim();
+  } catch {
+    // No secrets file or unreadable — fine in compat mode
+  }
+  return "";
+}
+const ORACLE_API_TOKEN = await loadOracleApiToken();
 const authHeaders: Record<string, string> = ORACLE_API_TOKEN
   ? { Authorization: `Bearer ${ORACLE_API_TOKEN}` }
   : {};
