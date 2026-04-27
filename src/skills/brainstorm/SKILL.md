@@ -38,6 +38,50 @@ REPO_ID=R_kgDORyOM0g
 CATEGORY_ID=DIC_kwDORyOM0s4C7w8w
 ```
 
+## Auto-Invocation Guide
+
+When an agent considers using /brainstorm autonomously (without human asking), use these tables:
+
+### When to brainstorm (vs just decide alone)
+
+| Situation | Brainstorm? | Why |
+|-----------|-------------|-----|
+| Naming, taglines, copy | Yes | Creative choices benefit from diverse styles |
+| Architecture decision with trade-offs | Yes (fan-out) | Multiple specialist angles reveal blind spots |
+| Content strategy or calendar | Yes | Creative + data + ops perspectives compound |
+| Bug fix or clear implementation | **No** | Already know the answer — just do it |
+| User asked a question | **No** | Answer directly — don't over-engineer |
+| Choosing between 2+ valid approaches | Yes (fan-out, 1 round) | Quick perspective check |
+
+### Agent Selection (by topic)
+
+| Topic domain | Primary | Secondary | Skip |
+|-------------|---------|-----------|------|
+| Content, copy, naming, branding | dora | trading (data angle) | devops |
+| Architecture, system design | devops | trading | — |
+| Market, pricing, business strategy | trading | dora (storytelling) | devops |
+| Infrastructure, ops, reliability | devops | — | dora |
+| Code design, API surface | reviewer | devops | dora |
+| Cross-cutting (needs all views) | dora + trading + devops | — | — |
+
+### Pattern Selection (by need)
+
+| What you need | Pattern | Rounds | Why |
+|--------------|---------|--------|-----|
+| Many viewpoints fast | fan-out | 1-2 | Parallel → synthesize |
+| Iterative refinement from different angles | round-robin | 2-3 | Each agent builds on previous |
+| Polished creative output (copy, pitch) | creative-critic | 3-4 | Create → critique → revise loop |
+| Quick validation ("is this good?") | fan-out | 1 | One-shot diverse check |
+| Don't know what you need | fan-out | 2 | Safe default |
+
+### Defaults when auto-invoking
+
+If the agent decides to brainstorm autonomously without human specifying params:
+- `--rounds 2` (don't burn budget on more unless topic is complex)
+- `--pattern fan-out` (safest default)
+- `--agents` based on topic table above (2 agents max for auto-invocation)
+- Do NOT `--publish` unless the output will be referenced later
+
 ## Step 0: Parse Arguments
 
 Parse the user's input. Extract:
