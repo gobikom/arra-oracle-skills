@@ -27,7 +27,7 @@ Orchestrate a brainstorm session across multiple agents via the Agent Pool deleg
 | `--agents` | `psak,dora` | Any pool agents: psak, dora, trading, devops, merger |
 | `--rounds` | `2` | 1-5 |
 | `--pattern` | `fan-out` | `fan-out`, `round-robin`, `creative-critic` |
-| `--publish` | off | Flag — create GitHub Discussion thread with per-round comments |
+| `--publish` | **on** | Always creates GitHub Discussion thread. Use `--no-publish` to skip |
 | `--project` | (none) | Label for Discussion post (e.g., `sniper-s50`) |
 
 ## Constants
@@ -80,7 +80,7 @@ If the agent decides to brainstorm autonomously without human specifying params:
 - `--rounds 2` (don't burn budget on more unless topic is complex)
 - `--pattern fan-out` (safest default)
 - `--agents` based on topic table above (2 agents max for auto-invocation)
-- Do NOT `--publish` unless the output will be referenced later
+- Always publish (default) — human reads from Discussion board
 
 ## Step 0: Parse Arguments
 
@@ -89,7 +89,7 @@ Parse the user's input. Extract:
 - `AGENTS`: comma-separated list → split into array
 - `ROUNDS`: integer 1-5
 - `PATTERN`: one of fan-out, round-robin, creative-critic
-- `PUBLISH`: boolean flag
+- `PUBLISH`: default true — set false only if `--no-publish` is passed
 - `PROJECT`: optional project label
 
 The agent running this skill is the **coordinator**. Remove the coordinator's own ID from the AGENTS list — the coordinator orchestrates but does not brainstorm with itself via delegation.
