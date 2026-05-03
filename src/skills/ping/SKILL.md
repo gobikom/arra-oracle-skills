@@ -64,54 +64,63 @@ Only proceed with `/ping` if state is `idle`.
 
 ### 1c. Resolve tmux target
 
+Try multiple naming patterns (agents use different tmux session names):
+
 ```bash
-TMUX_TARGET="ttyd-${TARGET_AGENT}"
-tmux has-session -t "$TMUX_TARGET" 2>/dev/null
+for CANDIDATE in "${TARGET_AGENT}" "ttyd-${TARGET_AGENT}"; do
+  if tmux has-session -t "$CANDIDATE" 2>/dev/null; then
+    TMUX_TARGET="$CANDIDATE"
+    break
+  fi
+done
 ```
 
-If tmux session doesn't exist → fall back to `/ask` and tell the user: "No tmux session for {agent} — falling back to /ask."
+If no tmux session found → fall back to `/ask` and tell the user: "No tmux session for {agent} — falling back to /ask."
 
-## Step 2: Capture Baseline
+## Step 2: Capture Baseline + Send + Poll
+
+Run this as a single bash script:
 
 ```bash
+# Capture baseline BEFORE sending
 BASELINE=$(tmux capture-pane -t "$TMUX_TARGET" -p -S -50)
-```
 
-Save the current pane content so we can detect when the response appears.
-
-## Step 3: Send Question
-
-```bash
+# Send the question (flatten newlines)
 SAFE_QUESTION=$(echo "$QUESTION" | tr '\n' ' ')
 tmux send-keys -l -t "$TMUX_TARGET" "$SAFE_QUESTION"
 tmux send-keys -t "$TMUX_TARGET" Enter
-```
 
-**Important**: Do NOT prepend `[Asked by ...]` — this is direct tmux injection, not going through the server delegation endpoint.
-
-## Step 4: Poll for Completion
-
-Poll every 1 second, max 30 seconds:
-
-```bash
+# Poll for completion (1s intervals, max 30s)
+RESPONSE=""
 for i in $(seq 1 30); do
   sleep 1
   PANE=$(tmux capture-pane -t "$TMUX_TARGET" -p -S -50)
   
-  # Check if pane changed from baseline (agent received input)
-  if [ "$PANE" != "$BASELINE" ]; then
-    # Check if prompt ❯ is at the bottom (agent finished)
-    LAST_LINES=$(echo "$PANE" | tail -5)
-    if echo "$LAST_LINES" | grep -qE '^[❯>]\s*$'; then
-      # Check not busy (no "Running…" indicator)
-      if ! echo "$LAST_LINES" | grep -qE '⎿\s*Running'; then
-        # Stable! Extract response
-        break
-      fi
+  # Must see change from baseline (agent received input)
+  if [ "$PANE" = "$BASELINE" ]; then continue; fi
+  
+  # Detection: look for EMPTY prompt ❯ at the very bottom (after separator)
+  # The input echo also shows ❯, so we need the FINAL one (idle prompt)
+  LAST_3=$(echo "$PANE" | tail -3)
+  
+  # Skip if still busy (Running…/⎿ indicators)
+  if echo "$LAST_3" | grep -qE '⎿\s*Running|● '; then continue; fi
+  
+  # Check for idle prompt: ❯ on its own line near bottom
+  if echo "$LAST_3" | grep -qE '^[❯>]\s*$'; then
+    # Extra stability: wait 1 more second and re-check
+    sleep 1
+    PANE2=$(tmux capture-pane -t "$TMUX_TARGET" -p -S -50)
+    if [ "$PANE" = "$PANE2" ]; then
+      RESPONSE="$PANE"
+      break
     fi
+    PANE="$PANE2"  # Update for next iteration
   fi
 done
 ```
+
+**Important**: Do NOT prepend `[Asked by ...]` — this is direct tmux injection, not going through the server delegation endpoint.
 
 If 30s reached without completion → report timeout and suggest `/ask`.
 
