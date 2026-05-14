@@ -74,9 +74,9 @@ Extract:
 ### 1a. Don't ask yourself
 If TARGET_AGENT == your own agent ID → just answer the question directly. Print: "That's me — answering directly." Then answer.
 
-### 1b. Validate agent + check state (single API call)
+### 1b. Validate agent + check state + prefix matching (single API call)
 
-One call to pool API resolves agent existence and state:
+One call to pool API resolves agent existence, state, and prefix matching:
 
 ```bash
 AGENT_INFO=$(curl -s http://localhost:8086/api/agents | python3 -c "
@@ -84,20 +84,39 @@ import sys, json
 agents = json.load(sys.stdin)
 ids = [a['id'] for a in agents]
 target = '${TARGET_AGENT}'
+
+# 1. Exact match → proceed
 if target in ids:
     state = next(a['pool_status']['state'] for a in agents if a['id'] == target)
-    print(f'FOUND|{state}')
+    print(f'EXACT|{target}|{state}')
 else:
-    print(f'NOT_FOUND|off|{','.join(ids)}')
+    # 2. Prefix match
+    matches = [a for a in agents if a['id'].startswith(target)]
+    if len(matches) == 1:
+        m = matches[0]
+        print(f'PREFIX|{m[\"id\"]}|{m[\"pool_status\"][\"state\"]}')
+    elif len(matches) > 1:
+        info = '; '.join(f'{m[\"id\"]} ({m[\"pool_status\"][\"state\"]})' for m in matches)
+        print(f'AMBIGUOUS||{info}')
+    else:
+        print(f'NOT_FOUND||{chr(44).join(ids)}')
 ")
 
-AGENT_STATUS=$(echo "$AGENT_INFO" | cut -d'|' -f1)
-STATE=$(echo "$AGENT_INFO" | cut -d'|' -f2)
+MATCH_TYPE=$(echo "$AGENT_INFO" | cut -d'|' -f1)
+RESOLVED_AGENT=$(echo "$AGENT_INFO" | cut -d'|' -f2)
+STATE_OR_INFO=$(echo "$AGENT_INFO" | cut -d'|' -f3)
 ```
 
-If `NOT_FOUND` → first word was not an agent ID. Auto-select using the keyword routing table above, and treat the full input as the question.
+| Result | Action |
+|--------|--------|
+| `EXACT` | Use resolved agent, check state |
+| `PREFIX` (1 match) | Use resolved agent (shorthand), inform: "Matched '{input}' → {agent}" |
+| `AMBIGUOUS` (2+ matches) | Show matches with state, ask to specify: "Multiple agents match '{input}': {list}" |
+| `NOT_FOUND` | First word was not an agent ID → auto-select using keyword routing table, treat full input as question |
 
-If `FOUND` and state is `off` → tell the user: "{agent} is offline. Use `/talk-to {agent}` to leave an async message instead."
+If state is `off` → tell the user: "{agent} is offline. Use `/talk-to {agent}` to leave an async message instead."
+
+**Fallback if pool API unreachable**: Use the keyword routing table for auto-select. If agent was explicitly named, proceed anyway (delegation endpoint will return 404 if invalid).
 
 **Fallback if pool API unreachable**: Use the keyword routing table for auto-select. If agent was explicitly named, proceed anyway (delegation endpoint will return 404 if invalid).
 
