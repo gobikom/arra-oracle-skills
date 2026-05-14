@@ -79,7 +79,7 @@ If TARGET_AGENT == your own agent ID → just answer the question directly. Prin
 One call to pool API resolves agent existence, state, and prefix matching:
 
 ```bash
-AGENT_INFO=$(curl -s http://localhost:8086/api/agents | python3 -c "
+AGENT_INFO=$(curl -s http://localhost:8086/api/agents/summary | python3 -c "
 import sys, json
 agents = json.load(sys.stdin)
 ids = [a['id'] for a in agents]
@@ -87,16 +87,16 @@ target = '${TARGET_AGENT}'
 
 # 1. Exact match → proceed
 if target in ids:
-    state = next(a['pool_status']['state'] for a in agents if a['id'] == target)
+    state = next(a['state'] for a in agents if a['id'] == target)
     print(f'EXACT|{target}|{state}')
 else:
     # 2. Prefix match
     matches = [a for a in agents if a['id'].startswith(target)]
     if len(matches) == 1:
         m = matches[0]
-        print(f'PREFIX|{m[\"id\"]}|{m[\"pool_status\"][\"state\"]}')
+        print(f'PREFIX|{m[\"id\"]}|{m[\"state\"]}')
     elif len(matches) > 1:
-        info = '; '.join(f'{m[\"id\"]} ({m[\"pool_status\"][\"state\"]})' for m in matches)
+        info = '; '.join(f'{m[\"id\"]} ({m[\"state\"]})' for m in matches)
         print(f'AMBIGUOUS||{info}')
     else:
         print(f'NOT_FOUND||{chr(44).join(ids)}')
