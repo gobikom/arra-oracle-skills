@@ -51,28 +51,56 @@ If TARGET_AGENT == your own agent ID → just answer directly.
 One call to pool API resolves agent existence, state, and platform:
 
 ```bash
-# Single API call: validate agent exists + get state + get all known IDs
+# Single API call: validate agent + get state + prefix matching
 AGENT_INFO=$(curl -s http://localhost:8086/api/agents | python3 -c "
 import sys, json
 agents = json.load(sys.stdin)
 ids = [a['id'] for a in agents]
 target = '${TARGET_AGENT}'
+
+# 1. Exact match → proceed
 if target in ids:
     state = next(a['pool_status']['state'] for a in agents if a['id'] == target)
-    print(f'FOUND|{state}')
+    print(f'EXACT|{target}|{state}')
 else:
-    print(f'NOT_FOUND|off|{','.join(ids)}')
+    # 2. Prefix match
+    matches = [a for a in agents if a['id'].startswith(target)]
+    if len(matches) == 1:
+        # Single prefix match → use it (convenience shorthand)
+        m = matches[0]
+        print(f'PREFIX|{m[\"id\"]}|{m[\"pool_status\"][\"state\"]}')
+    elif len(matches) > 1:
+        # Multiple prefix matches → disambiguation needed
+        info = '; '.join(f'{m[\"id\"]} ({m[\"pool_status\"][\"state\"]})' for m in matches)
+        print(f'AMBIGUOUS||{info}')
+    else:
+        # No match at all
+        print(f'NOT_FOUND||{chr(44).join(ids)}')
 ")
 
-AGENT_STATUS=$(echo "$AGENT_INFO" | cut -d'|' -f1)
-STATE=$(echo "$AGENT_INFO" | cut -d'|' -f2)
+MATCH_TYPE=$(echo "$AGENT_INFO" | cut -d'|' -f1)
+RESOLVED_AGENT=$(echo "$AGENT_INFO" | cut -d'|' -f2)
+STATE_OR_INFO=$(echo "$AGENT_INFO" | cut -d'|' -f3)
 
-# If agent not found in pool → show available agents
-if [ "$AGENT_STATUS" = "NOT_FOUND" ]; then
-    AVAILABLE=$(echo "$AGENT_INFO" | cut -d'|' -f3)
-    echo "Agent '${TARGET_AGENT}' not found in pool. Available: ${AVAILABLE}"
-    # Exit — cannot ping unknown agent
-fi
+case "$MATCH_TYPE" in
+  EXACT)
+    TARGET_AGENT="$RESOLVED_AGENT"
+    STATE="$STATE_OR_INFO"
+    ;;
+  PREFIX)
+    TARGET_AGENT="$RESOLVED_AGENT"
+    STATE="$STATE_OR_INFO"
+    # Inform: "Matched 'devl' → devlead-codex"
+    ;;
+  AMBIGUOUS)
+    # Show disambiguation and stop:
+    # "Multiple agents match 'devl': devlead (idle); devlead-glm (active); devlead-codex (idle)"
+    # "Specify the full agent ID."
+    ;;
+  NOT_FOUND)
+    # "Agent 'xyz' not found. Available: dora, devops, psak, ..."
+    ;;
+esac
 
 # Detect platform from agent YAML (pool API doesn't expose this yet)
 PLATFORM=$(python3 -c "
