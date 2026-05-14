@@ -47,15 +47,28 @@ Known agent IDs: `dora`, `devops`, `psak`, `trading`, `reviewer`, `dev`, `devlea
 ### 1a. Don't ping yourself
 If TARGET_AGENT == your own agent ID → just answer directly.
 
-### 1b. Check agent is idle + online
+### 1b. Check agent is idle + online, detect platform
 
 ```bash
+# Single API call: get state + detect platform from agent YAML
 STATE=$(curl -s http://localhost:8086/api/agents | python3 -c "
 import sys, json
 for a in json.load(sys.stdin):
     if a['id'] == '${TARGET_AGENT}':
         print(a['pool_status']['state'])
 ")
+
+# Detect platform (pool API doesn't expose this yet — read from YAML)
+PLATFORM=$(python3 -c "
+import yaml, os
+p = os.path.expanduser('~/repos/agents/soul-orchestra/agents/${TARGET_AGENT}.yaml')
+try:
+    with open(p) as f:
+        d = yaml.safe_load(f)
+    print(d.get('preferred_platform', 'claude_code'))
+except FileNotFoundError:
+    print('claude_code')
+" 2>/dev/null || echo "claude_code")
 ```
 
 **Only proceed if STATE is `idle` or `active`.** All other states are blocked:
@@ -73,22 +86,37 @@ Direct tmux injection requires the agent to be online and not in a task or inter
 
 ### 1c. Resolve tmux target
 
-Try multiple naming patterns (agents use different tmux session names):
+Read `tmux_session` from agent YAML first, then try naming patterns as fallback:
 
 ```bash
-for CANDIDATE in "${TARGET_AGENT}" "ttyd-${TARGET_AGENT}"; do
-  if tmux has-session -t "$CANDIDATE" 2>/dev/null; then
-    TMUX_TARGET="$CANDIDATE"
-    break
-  fi
-done
+# Try YAML-defined session name first
+TMUX_TARGET=$(python3 -c "
+import yaml, os
+p = os.path.expanduser('~/repos/agents/soul-orchestra/agents/${TARGET_AGENT}.yaml')
+try:
+    with open(p) as f:
+        d = yaml.safe_load(f)
+    print(d.get('tmux_session', '${TARGET_AGENT}'))
+except FileNotFoundError:
+    print('${TARGET_AGENT}')
+" 2>/dev/null || echo "${TARGET_AGENT}")
+
+# Verify session exists, try fallback patterns if not
+if ! tmux has-session -t "$TMUX_TARGET" 2>/dev/null; then
+  for CANDIDATE in "${TARGET_AGENT}" "ttyd-${TARGET_AGENT}"; do
+    if tmux has-session -t "$CANDIDATE" 2>/dev/null; then
+      TMUX_TARGET="$CANDIDATE"
+      break
+    fi
+  done
+fi
 ```
 
 If no tmux session found → fall back to `/ask` and tell the user: "No tmux session for {agent} — falling back to /ask."
 
 ## Step 2: Capture Baseline + Send + Poll
 
-Run this as a single bash script:
+Run this as a single bash script. The polling loop uses **platform-aware idle and busy detection** so it works with both Claude Code and Codex CLI agents.
 
 ```bash
 # Capture baseline BEFORE sending
@@ -108,15 +136,33 @@ for i in $(seq 1 30); do
   # Must see change from baseline (agent received input)
   if [ "$PANE" = "$BASELINE" ]; then continue; fi
   
-  # Detection: look for EMPTY prompt ❯ at the very bottom (after separator)
-  # The input echo also shows ❯, so we need the FINAL one (idle prompt)
-  LAST_3=$(echo "$PANE" | tail -3)
+  TAIL_5=$(echo "$PANE" | tail -5)
   
-  # Skip if still busy (Running…/⎿ indicators)
-  if echo "$LAST_3" | grep -qE '⎿\s*Running|● '; then continue; fi
+  # --- Platform-aware busy detection ---
+  if [ "$PLATFORM" = "codex" ]; then
+    # Codex busy: spinner characters or active output indicators
+    if echo "$TAIL_5" | grep -qE '⠋|⠙|⠹|⠸|Thinking|Running'; then continue; fi
+  else
+    # Claude Code busy: ⎿ Running… or tool execution indicators
+    if echo "$TAIL_5" | grep -qE '⎿\s*Running|● '; then continue; fi
+  fi
   
-  # Check for idle prompt: ❯ on its own line near bottom
-  if echo "$LAST_3" | grep -qE '^[❯>]\s*$'; then
+  # --- Platform-aware idle detection ---
+  IDLE_DETECTED=false
+  if [ "$PLATFORM" = "codex" ]; then
+    # Codex idle: line starts with › AND a nearby line has model · path status bar
+    if echo "$TAIL_5" | grep -qE '^› ' && \
+       echo "$TAIL_5" | grep -qE '^\s+(gpt-|o[0-9]|claude-).*·'; then
+      IDLE_DETECTED=true
+    fi
+  else
+    # Claude Code idle: ❯ on its own line near bottom
+    if echo "$TAIL_5" | grep -qE '^[❯>]\s*$'; then
+      IDLE_DETECTED=true
+    fi
+  fi
+  
+  if [ "$IDLE_DETECTED" = "true" ]; then
     # Extra stability: wait 1 more second and re-check
     sleep 1
     PANE2=$(tmux capture-pane -t "$TMUX_TARGET" -p -S -50)
@@ -133,15 +179,25 @@ done
 
 If 30s reached without completion → report timeout and suggest `/ask`.
 
-## Step 5: Extract Response
+## Step 5: Extract Response (platform-aware)
 
-Take the pane output, strip:
+Take the pane output and strip platform-specific artifacts:
+
+**Claude Code** — strip:
 - Lines that match the original question (input echo)
 - Prompt lines (`❯`)
 - Horizontal rules (`────`)
 - Permission/bypass lines
 - Token/cost indicators
 - Skill listing noise
+
+**Codex CLI** — strip:
+- Lines that match the original question (input echo)
+- Prompt lines (`›` + placeholder hint)
+- Status bar lines (model · directory)
+- Box drawing characters (`╭`, `╰`, `│`)
+- Spinner characters (`⠋`, `⠙`, `⠹`, `⠸`)
+- Warning lines (`⚠ MCP ...`)
 
 Present cleanly:
 
@@ -180,7 +236,8 @@ If the answer is important → save via `arra_learn` or `write_memory` as usual.
 | **Speed** | ~5-10s | ~30-40s | ~30-40s per turn | ~0s (async) |
 | **Path** | Direct tmux | Sync task queue | Sync task queue | Async task queue |
 | **Audit** | None | Full (audit DB) | Full | Task queue + issue |
-| **Agent state** | Must be idle | Any (queued) | Any (queued) | Any (queued) |
+| **Agent state** | Must be idle/active | Any (queued) | Any (queued) | Any (queued) |
+| **Platforms** | Claude Code + Codex | Claude Code + Codex | Claude Code + Codex | Claude Code + Codex |
 | **History** | None | Saved to file | Multi-turn context | Issue comment |
 | **Conflict risk** | Yes (if agent gets busy) | None (queued) | None | None |
 | **Timeout risk** | 30s hard | 120-180s | 120-180s | None (async) |
