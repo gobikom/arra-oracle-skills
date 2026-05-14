@@ -52,67 +52,52 @@ One call to pool API resolves agent existence, state, and platform:
 
 ```bash
 # Single API call: validate agent + get state + prefix matching
-AGENT_INFO=$(curl -s http://localhost:8086/api/agents | python3 -c "
+AGENT_INFO=$(curl -s http://localhost:8086/api/agents/summary | python3 -c "
 import sys, json
 agents = json.load(sys.stdin)
 ids = [a['id'] for a in agents]
 target = '${TARGET_AGENT}'
 
-# 1. Exact match → proceed
+# 1. Exact match → proceed (include platform from summary)
 if target in ids:
-    state = next(a['pool_status']['state'] for a in agents if a['id'] == target)
-    print(f'EXACT|{target}|{state}')
+    a = next(a for a in agents if a['id'] == target)
+    print(f'EXACT|{target}|{a[\"state\"]}|{a.get(\"platform\",\"claude_code\")}')
 else:
     # 2. Prefix match
     matches = [a for a in agents if a['id'].startswith(target)]
     if len(matches) == 1:
-        # Single prefix match → use it (convenience shorthand)
         m = matches[0]
-        print(f'PREFIX|{m[\"id\"]}|{m[\"pool_status\"][\"state\"]}')
+        print(f'PREFIX|{m[\"id\"]}|{m[\"state\"]}|{m.get(\"platform\",\"claude_code\")}')
     elif len(matches) > 1:
-        # Multiple prefix matches → disambiguation needed
-        info = '; '.join(f'{m[\"id\"]} ({m[\"pool_status\"][\"state\"]})' for m in matches)
-        print(f'AMBIGUOUS||{info}')
+        info = '; '.join(f'{m[\"id\"]} ({m[\"state\"]}, {m.get(\"platform\",\"claude_code\")})' for m in matches)
+        print(f'AMBIGUOUS|||{info}')
     else:
-        # No match at all
-        print(f'NOT_FOUND||{chr(44).join(ids)}')
+        print(f'NOT_FOUND|||{chr(44).join(ids)}')
 ")
 
 MATCH_TYPE=$(echo "$AGENT_INFO" | cut -d'|' -f1)
 RESOLVED_AGENT=$(echo "$AGENT_INFO" | cut -d'|' -f2)
-STATE_OR_INFO=$(echo "$AGENT_INFO" | cut -d'|' -f3)
+STATE=$(echo "$AGENT_INFO" | cut -d'|' -f3)
+PLATFORM=$(echo "$AGENT_INFO" | cut -d'|' -f4)
 
 case "$MATCH_TYPE" in
   EXACT)
     TARGET_AGENT="$RESOLVED_AGENT"
-    STATE="$STATE_OR_INFO"
     ;;
   PREFIX)
     TARGET_AGENT="$RESOLVED_AGENT"
-    STATE="$STATE_OR_INFO"
     # Inform: "Matched 'devl' → devlead-codex"
     ;;
   AMBIGUOUS)
     # Show disambiguation and stop:
-    # "Multiple agents match 'devl': devlead (idle); devlead-glm (active); devlead-codex (idle)"
+    # "Multiple agents match 'devl': devlead (idle, claude_code); devlead-codex (idle, codex)"
     # "Specify the full agent ID."
     ;;
   NOT_FOUND)
     # "Agent 'xyz' not found. Available: dora, devops, psak, ..."
     ;;
 esac
-
-# Detect platform from agent YAML (pool API doesn't expose this yet)
-PLATFORM=$(python3 -c "
-import yaml, os
-p = os.path.expanduser('~/repos/agents/soul-orchestra/agents/${TARGET_AGENT}.yaml')
-try:
-    with open(p) as f:
-        d = yaml.safe_load(f)
-    print(d.get('preferred_platform', 'claude_code'))
-except FileNotFoundError:
-    print('claude_code')
-" 2>/dev/null || echo "claude_code")
+# PLATFORM is now resolved from summary API — no separate YAML read needed
 ```
 
 **Only proceed if STATE is `idle` or `active`.** All other states are blocked:
