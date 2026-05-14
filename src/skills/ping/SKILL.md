@@ -32,6 +32,7 @@ Ask another agent a quick question via direct tmux injection. Bypasses the task 
 | Multi-turn follow-up | `/ask --continue` |
 | Agent might need to search/research (>30s) | `/ask` |
 | Agent is busy (mid-task) | `/ask` (queue it) |
+| Long-running task (QA, review, investigation) | `/delegate-qa` (async, no timeout) |
 
 ## Step 0: Parse Arguments
 
@@ -46,7 +47,7 @@ Known agent IDs: `dora`, `devops`, `psak`, `trading`, `reviewer`, `dev`, `devlea
 ### 1a. Don't ping yourself
 If TARGET_AGENT == your own agent ID → just answer directly.
 
-### 1b. Check agent is idle
+### 1b. Check agent is idle + online
 
 ```bash
 STATE=$(curl -s http://localhost:8086/api/agents | python3 -c "
@@ -57,10 +58,18 @@ for a in json.load(sys.stdin):
 ")
 ```
 
-- If `off` → "{agent} is offline. Use `/talk-to` instead."
-- If `busy` → "⚠️ {agent} is busy (mid-task). Use `/ask` to queue your question instead — /ping might conflict."
+**Only proceed if STATE is `idle` or `active`.** All other states are blocked:
 
-Only proceed with `/ping` if state is `idle`.
+| State | Action |
+|-------|--------|
+| `idle` | Proceed — agent is online and waiting |
+| `active` | Proceed — agent is online, not in a task |
+| `off` | "{agent} is offline. Use `/talk-to` instead." |
+| `busy` | "{agent} is busy (mid-task). Use `/ask` to queue your question instead." |
+| `interactive` | "{agent} is in interactive mode (human using terminal). Use `/ask` to queue instead." |
+| other/empty | "{agent} status unknown. Use `/ask` as fallback." |
+
+Direct tmux injection requires the agent to be online and not in a task or interactive session.
 
 ### 1c. Resolve tmux target
 
@@ -164,14 +173,15 @@ If the answer is important → save via `arra_learn` or `write_memory` as usual.
 | 30s timeout | Report, suggest `/ask` |
 | tmux send-keys fails | Report error, suggest `/ask` |
 
-## Difference from /ask
+## Difference from /ask and /delegate-qa
 
-| | /ping | /ask | /ask --continue |
-|---|---|---|---|
-| **Speed** | ~5-10s | ~30-40s | ~30-40s per turn |
-| **Path** | Direct tmux | Task queue | Task queue |
-| **Audit** | None | Full (audit DB) | Full |
-| **Agent state** | Must be idle | Any (queued) | Any (queued) |
-| **History** | None | Saved to file | Multi-turn context |
-| **Conflict risk** | Yes (if agent gets busy) | None (queued) | None |
-| **Use when** | Quick check, agent is idle | Important Q&A, tracking needed | Follow-up conversation |
+| | /ping | /ask | /ask --continue | /delegate-qa |
+|---|---|---|---|---|
+| **Speed** | ~5-10s | ~30-40s | ~30-40s per turn | ~0s (async) |
+| **Path** | Direct tmux | Sync task queue | Sync task queue | Async task queue |
+| **Audit** | None | Full (audit DB) | Full | Task queue + issue |
+| **Agent state** | Must be idle | Any (queued) | Any (queued) | Any (queued) |
+| **History** | None | Saved to file | Multi-turn context | Issue comment |
+| **Conflict risk** | Yes (if agent gets busy) | None (queued) | None | None |
+| **Timeout risk** | 30s hard | 120-180s | 120-180s | None (async) |
+| **Use when** | Quick check, agent is idle | Important Q&A, tracking needed | Follow-up conversation | Long QA/review (>2 min) |

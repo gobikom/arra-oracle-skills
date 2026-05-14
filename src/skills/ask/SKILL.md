@@ -53,6 +53,7 @@ If the user or agent says `/ask "question"` without specifying a target, auto-se
 - **You ARE the target agent** → answer directly, don't delegate to yourself
 - **Question needs 3+ perspectives or creative refinement** → use `/brainstorm` instead (for multi-turn follow-ups with ONE agent, use `/ask --continue`)
 - **Question is for the human** → just ask in the conversation, don't delegate
+- **Task will take > 2 minutes** (QA, full review, investigation) → use `/delegate-qa` instead — sync timeout will produce false "failed" status
 
 ## Step 0: Parse Arguments
 
@@ -162,12 +163,12 @@ On a **new conversation** (no `--continue` flag and history file exists from a d
 
 If the answer is important enough to save → the agent should use `arra_learn` or `write_memory` after receiving it (normal proactive memory rules apply).
 
-## Difference from /brainstorm and /talk-to
+## Difference from /brainstorm, /delegate-qa, and /talk-to
 
-| | /ask | /ask --continue | /brainstorm | /talk-to |
-|---|---|---|---|---|
-| **Speed** | 10-30s | 10-30s per turn | 1-3 min | Async (next session) |
-| **Agents** | 1 | 1 | 1-5 | 1 |
-| **Rounds** | 1 (single Q&A) | Multi-turn (up to 10) | 2-5 (refinement loop) | Multi-turn thread |
-| **Output** | Inline answer | Inline (with context) | Archive + Discussion + Telegram | Oracle thread |
-| **Use when** | Need info now | Follow-up on previous answer | Need ideas from multiple perspectives | Leave message for later |
+| | /ask | /ask --continue | /delegate-qa | /brainstorm | /talk-to |
+|---|---|---|---|---|---|
+| **Speed** | 10-30s | 10-30s per turn | ~0s (async) | 1-3 min | Async (next session) |
+| **Agents** | 1 | 1 | 1 (long-running) | 1-5 | 1 |
+| **Rounds** | 1 (single Q&A) | Multi-turn (up to 10) | 1 (fire-and-forget) | 2-5 (refinement loop) | Multi-turn thread |
+| **Output** | Inline answer | Inline (with context) | Issue comment | Archive + Discussion + Telegram | Oracle thread |
+| **Use when** | Need info now | Follow-up on previous answer | Long-running QA/review | Need ideas from multiple perspectives | Leave message for later |
