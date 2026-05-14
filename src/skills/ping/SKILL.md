@@ -36,29 +36,45 @@ Ask another agent a quick question via direct tmux injection. Bypasses the task 
 
 ## Step 0: Parse Arguments
 
-Same as `/ask`:
-- `TARGET_AGENT`: first word if it matches a known agent ID, otherwise auto-select
+- `TARGET_AGENT`: first word — validated against **live pool API** (no hardcoded list)
 - `QUESTION`: everything else (with or without quotes)
 
-Known agent IDs: `dora`, `devops`, `psak`, `trading`, `reviewer`, `dev`, `devlead`, `trex`, `finn`, `lex`, `mako`, `sol`, `merger`
+Agent IDs are discovered dynamically from `GET /api/agents`. No hardcoded list to maintain.
 
 ## Step 1: Validate
 
 ### 1a. Don't ping yourself
 If TARGET_AGENT == your own agent ID → just answer directly.
 
-### 1b. Check agent is idle + online, detect platform
+### 1b. Validate agent + check state + detect platform (single API call)
+
+One call to pool API resolves agent existence, state, and platform:
 
 ```bash
-# Single API call: get state + detect platform from agent YAML
-STATE=$(curl -s http://localhost:8086/api/agents | python3 -c "
+# Single API call: validate agent exists + get state + get all known IDs
+AGENT_INFO=$(curl -s http://localhost:8086/api/agents | python3 -c "
 import sys, json
-for a in json.load(sys.stdin):
-    if a['id'] == '${TARGET_AGENT}':
-        print(a['pool_status']['state'])
+agents = json.load(sys.stdin)
+ids = [a['id'] for a in agents]
+target = '${TARGET_AGENT}'
+if target in ids:
+    state = next(a['pool_status']['state'] for a in agents if a['id'] == target)
+    print(f'FOUND|{state}')
+else:
+    print(f'NOT_FOUND|off|{','.join(ids)}')
 ")
 
-# Detect platform (pool API doesn't expose this yet — read from YAML)
+AGENT_STATUS=$(echo "$AGENT_INFO" | cut -d'|' -f1)
+STATE=$(echo "$AGENT_INFO" | cut -d'|' -f2)
+
+# If agent not found in pool → show available agents
+if [ "$AGENT_STATUS" = "NOT_FOUND" ]; then
+    AVAILABLE=$(echo "$AGENT_INFO" | cut -d'|' -f3)
+    echo "Agent '${TARGET_AGENT}' not found in pool. Available: ${AVAILABLE}"
+    # Exit — cannot ping unknown agent
+fi
+
+# Detect platform from agent YAML (pool API doesn't expose this yet)
 PLATFORM=$(python3 -c "
 import yaml, os
 p = os.path.expanduser('~/repos/agents/soul-orchestra/agents/${TARGET_AGENT}.yaml')

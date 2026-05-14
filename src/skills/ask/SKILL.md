@@ -66,7 +66,7 @@ If the user or agent says `/ask "question"` without specifying a target, auto-se
 
 Extract:
 - `CONTINUE_MODE`: true if args start with `--continue`
-- `TARGET_AGENT`: first word (after removing `--continue`) if it matches a known agent ID, otherwise auto-select
+- `TARGET_AGENT`: first word (after removing `--continue`) — validated against **live pool API** (no hardcoded list). If first word is not a known agent ID, treat it as part of the question and auto-select agent.
 - `QUESTION`: everything else (with or without quotes)
 
 ## Step 1: Validate
@@ -74,18 +74,32 @@ Extract:
 ### 1a. Don't ask yourself
 If TARGET_AGENT == your own agent ID → just answer the question directly. Print: "That's me — answering directly." Then answer.
 
-### 1b. Pool health check
+### 1b. Validate agent + check state (single API call)
+
+One call to pool API resolves agent existence and state:
 
 ```bash
-STATE=$(curl -s http://localhost:8086/api/agents | python3 -c "
+AGENT_INFO=$(curl -s http://localhost:8086/api/agents | python3 -c "
 import sys, json
-for a in json.load(sys.stdin):
-    if a['id'] == '${TARGET_AGENT}':
-        print(a['pool_status']['state'])
+agents = json.load(sys.stdin)
+ids = [a['id'] for a in agents]
+target = '${TARGET_AGENT}'
+if target in ids:
+    state = next(a['pool_status']['state'] for a in agents if a['id'] == target)
+    print(f'FOUND|{state}')
+else:
+    print(f'NOT_FOUND|off|{','.join(ids)}')
 ")
+
+AGENT_STATUS=$(echo "$AGENT_INFO" | cut -d'|' -f1)
+STATE=$(echo "$AGENT_INFO" | cut -d'|' -f2)
 ```
 
-If `off` → tell the user: "{agent} is offline. Use `/talk-to {agent}` to leave an async message instead."
+If `NOT_FOUND` → first word was not an agent ID. Auto-select using the keyword routing table above, and treat the full input as the question.
+
+If `FOUND` and state is `off` → tell the user: "{agent} is offline. Use `/talk-to {agent}` to leave an async message instead."
+
+**Fallback if pool API unreachable**: Use the keyword routing table for auto-select. If agent was explicitly named, proceed anyway (delegation endpoint will return 404 if invalid).
 
 ## Step 1c: Build Instruction (multi-turn support)
 
