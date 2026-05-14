@@ -139,7 +139,6 @@ fi
 
 # Poll for completion (2s intervals, max 30 iterations = 60s)
 RESPONSE=""
-SEEN_PROCESSING=false
 for i in $(seq 1 30); do
   sleep 2
   PANE=$(tmux capture-pane -t "$TMUX_TARGET" -p -S -50)
@@ -151,29 +150,27 @@ for i in $(seq 1 30); do
   
   # --- Platform-aware busy detection ---
   if [ "$PLATFORM" = "codex" ]; then
-    # Codex busy: spinner, tool execution (•), Working indicator, or ────── separator (mid-response)
-    if echo "$TAIL_5" | grep -qE '⠋|⠙|⠹|⠸|Working|^• |^────'; then
-      SEEN_PROCESSING=true
-      continue
-    fi
+    # Codex busy: spinner, tool execution (•), Working indicator
+    if echo "$TAIL_5" | grep -qE '⠋|⠙|⠹|⠸|Working|^• '; then continue; fi
   else
     # Claude Code busy: ⎿ Running… or tool execution indicators
-    if echo "$TAIL_5" | grep -qE '⎿\s*Running|● '; then
-      SEEN_PROCESSING=true
-      continue
-    fi
+    if echo "$TAIL_5" | grep -qE '⎿\s*Running|● '; then continue; fi
   fi
   
   # --- Platform-aware idle detection ---
   IDLE_DETECTED=false
   if [ "$PLATFORM" = "codex" ]; then
-    # Codex idle: line starts with › AND a nearby line has model · path status bar
-    # IMPORTANT: only trust idle AFTER we've seen processing start (SEEN_PROCESSING=true)
-    # Otherwise we get false idle from the prompt still showing the input before Codex processes it
-    if [ "$SEEN_PROCESSING" = "true" ] && \
-       echo "$TAIL_5" | grep -qE '^› ' && \
-       echo "$TAIL_5" | grep -qE '^\s+(gpt-|o[0-9]|claude-).*·'; then
-      IDLE_DETECTED=true
+    # Codex idle: › prompt + status bar, BUT the › line must NOT contain
+    # our original question. This distinguishes "input typed, not yet submitted"
+    # from "response complete, new prompt shown".
+    # Pre-processing: › say hi briefly, who are you?     ← contains our question
+    # Post-response:  › Write tests for @filename         ← default placeholder
+    PROMPT_LINE=$(echo "$TAIL_5" | grep -E '^› ' | head -1)
+    HAS_STATUS_BAR=$(echo "$TAIL_5" | grep -cE '^\s+(gpt-|o[0-9]|claude-).*·')
+    if [ -n "$PROMPT_LINE" ] && [ "$HAS_STATUS_BAR" -gt 0 ]; then
+      if ! echo "$PROMPT_LINE" | grep -qF "$SAFE_QUESTION"; then
+        IDLE_DETECTED=true
+      fi
     fi
   else
     # Claude Code idle: ❯ on its own line near bottom
