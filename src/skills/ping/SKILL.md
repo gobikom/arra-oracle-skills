@@ -118,6 +118,10 @@ If no tmux session found → fall back to `/ask` and tell the user: "No tmux ses
 
 Run this as a single bash script. The polling loop uses **platform-aware idle and busy detection** so it works with both Claude Code and Codex CLI agents.
 
+### Platform-specific input behavior
+
+Codex interactive mode requires **Enter twice** — first Enter places text into the prompt, second Enter submits it. Claude Code submits on first Enter.
+
 ```bash
 # Capture baseline BEFORE sending
 BASELINE=$(tmux capture-pane -t "$TMUX_TARGET" -p -S -50)
@@ -127,10 +131,17 @@ SAFE_QUESTION=$(echo "$QUESTION" | tr '\n' ' ')
 tmux send-keys -l -t "$TMUX_TARGET" "$SAFE_QUESTION"
 tmux send-keys -t "$TMUX_TARGET" Enter
 
-# Poll for completion (1s intervals, max 30s)
+# Codex interactive needs a second Enter to submit the prompt
+if [ "$PLATFORM" = "codex" ]; then
+  sleep 0.5
+  tmux send-keys -t "$TMUX_TARGET" Enter
+fi
+
+# Poll for completion (2s intervals, max 30 iterations = 60s)
 RESPONSE=""
+SEEN_PROCESSING=false
 for i in $(seq 1 30); do
-  sleep 1
+  sleep 2
   PANE=$(tmux capture-pane -t "$TMUX_TARGET" -p -S -50)
   
   # Must see change from baseline (agent received input)
@@ -140,18 +151,27 @@ for i in $(seq 1 30); do
   
   # --- Platform-aware busy detection ---
   if [ "$PLATFORM" = "codex" ]; then
-    # Codex busy: spinner characters or active output indicators
-    if echo "$TAIL_5" | grep -qE '⠋|⠙|⠹|⠸|Thinking|Running'; then continue; fi
+    # Codex busy: spinner, tool execution (•), Working indicator, or ────── separator (mid-response)
+    if echo "$TAIL_5" | grep -qE '⠋|⠙|⠹|⠸|Working|^• |^────'; then
+      SEEN_PROCESSING=true
+      continue
+    fi
   else
     # Claude Code busy: ⎿ Running… or tool execution indicators
-    if echo "$TAIL_5" | grep -qE '⎿\s*Running|● '; then continue; fi
+    if echo "$TAIL_5" | grep -qE '⎿\s*Running|● '; then
+      SEEN_PROCESSING=true
+      continue
+    fi
   fi
   
   # --- Platform-aware idle detection ---
   IDLE_DETECTED=false
   if [ "$PLATFORM" = "codex" ]; then
     # Codex idle: line starts with › AND a nearby line has model · path status bar
-    if echo "$TAIL_5" | grep -qE '^› ' && \
+    # IMPORTANT: only trust idle AFTER we've seen processing start (SEEN_PROCESSING=true)
+    # Otherwise we get false idle from the prompt still showing the input before Codex processes it
+    if [ "$SEEN_PROCESSING" = "true" ] && \
+       echo "$TAIL_5" | grep -qE '^› ' && \
        echo "$TAIL_5" | grep -qE '^\s+(gpt-|o[0-9]|claude-).*·'; then
       IDLE_DETECTED=true
     fi
